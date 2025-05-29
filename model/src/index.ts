@@ -1,0 +1,80 @@
+import { deriveLabels, InferOutputsType, isPColumnSpecResult, PlRef, readOutput } from '@platforma-sdk/model';
+import { BlockModel } from '@platforma-sdk/model';
+
+
+// rules
+
+
+export type BlockArgs = {
+  num?: string;
+  name?: string;
+  dataset?: PlRef;
+  numRules?: ((num: string) => boolean | string)[];
+};
+export type DatasetOption = {
+  ref: PlRef;
+  label: string;
+  assemblingFeature: string;
+};
+
+function numRule(num: string | undefined): boolean {
+  const numValue = Number(num);
+  return numValue > 0 && numValue < 100;
+}
+
+function numRuleError(num: string | undefined): boolean | string {
+  if (numRule(num)) {
+    return 'Input a number between 1 and 100';
+  }
+  return true;
+}
+
+
+/*************************
+ *         MODEL         *
+ *************************/
+export const model = BlockModel.create()
+
+  /*************************
+   *          ARGS         *
+   *************************/
+  .withArgs<BlockArgs>({
+    numRules: [numRuleError]
+  })
+  .argsValid((ctx) => (ctx.args.dataset !== undefined && numRule(ctx.args.num)))
+
+  /*************************
+   *        OUTPUTS        *
+   *************************/
+  .output('tengoMessage', (ctx) => ctx.outputs?.resolve('tengoMessage')?.getDataAsJson())
+  // .output('pythonMessage', (ctx) => ctx.outputs?.resolve('pythonMessage')?.getDataAsString())
+  .output('result', (ctx) => ctx.outputs?.resolve('result')?.getDataAsJson())
+  // Get MiXCR outputs from the result pool
+  .output('datasetOptions', (ctx) =>
+    ctx.resultPool.getOptions([{
+        axes: [
+          { name: 'pl7.app/sampleId' },
+          { name: 'pl7.app/vdj/clonotypeKey' }
+        ],
+        annotations: { 'pl7.app/isAnchor': 'true' }
+      }, {
+        axes: [
+          { name: 'pl7.app/sampleId' },
+          { name: 'pl7.app/vdj/scClonotypeKey' }
+        ],
+        annotations: { 'pl7.app/isAnchor': 'true' }
+      }]
+      /*      {
+              // suppress native label of the column (e.g. "Number of Reads") to show only the dataset label
+              label: { includeNativeLabel: false },
+            }*/)
+  )
+
+
+  /*************************
+   *        SECTIONS       *
+   *************************/
+  .sections((_ctx) => [{ type: 'link', href: '/', label: 'Main' }])
+  .done();
+
+export type BlockOutputs = InferOutputsType<typeof model>;
