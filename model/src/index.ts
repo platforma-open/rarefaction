@@ -8,7 +8,7 @@ import { BlockModel } from '@platforma-sdk/model';
 export type BlockArgs = {
   num?: string;
   name?: string;
-  dataset?: PlRef;
+  datasetRef?: PlRef;
   numRules?: ((num: string) => boolean | string)[];
 };
 export type DatasetOption = {
@@ -41,7 +41,7 @@ export const model = BlockModel.create()
   .withArgs<BlockArgs>({
     numRules: [numRuleError]
   })
-  .argsValid((ctx) => (ctx.args.dataset !== undefined && numRule(ctx.args.num)))
+  .argsValid((ctx) => (ctx.args.datasetRef !== undefined && numRule(ctx.args.num)))
 
   /*************************
    *        OUTPUTS        *

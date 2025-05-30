@@ -35,7 +35,7 @@ wf.body(func(args) {
 //	pythonMessage := python.getStdoutFileContent()
 	pythonMessage := "python.getStdoutFileContent()"
 
-	ll.panic(args.columns)
+	ll.panic("", args.columns)
 
 	tengoMessage := "Hello from Tengo, " + args.name + "!"
 	clones := [

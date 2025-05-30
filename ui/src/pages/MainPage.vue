@@ -31,7 +31,7 @@ const result = computed(() => {
     <PlDropdownRef
       label="Select dataset"
       :options="app.model.outputs.datasetOptions"
-      v-model="app.model.args.dataset"
+      v-model="app.model.args.datasetRef"
     />
     <PlTextField
       label="Input points number"
