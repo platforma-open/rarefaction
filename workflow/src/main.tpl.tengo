@@ -2,6 +2,29 @@
 wf := import("@platforma-sdk/workflow-tengo:workflow")
 exec := import("@platforma-sdk/workflow-tengo:exec")
 assets:= import("@platforma-sdk/workflow-tengo:assets")
+ll:= import("@platforma-sdk/workflow-tengo:ll")
+
+wf.prepare(func(args) {
+	bundleBuilder := wf.createPBundleBuilder()
+	bundleBuilder.ignoreMissingDomains() // to make query work for both bulk and single cell data
+	bundleBuilder.addAnchor("main", args.datasetRef)
+
+	// abundance
+	bundleBuilder.addSingle({
+		axes: [ { anchor: "main", idx: 0 }, { anchor: "main", idx: 1 }],
+		annotations: {
+				"pl7.app/isAbundance": "true",
+				"pl7.app/abundance/normalized": "false",
+				"pl7.app/abundance/isPrimary": "true"
+			}
+		},
+		"abundance")
+
+
+	return {
+		columns: bundleBuilder.build()
+		}
+})
 
 wf.body(func(args) {
 //	python := exec.builder().
@@ -12,12 +35,17 @@ wf.body(func(args) {
 //	pythonMessage := python.getStdoutFileContent()
 	pythonMessage := "python.getStdoutFileContent()"
 
+	ll.panic(args.columns)
+
 	tengoMessage := "Hello from Tengo, " + args.name + "!"
 	clones := [
-        ["a", 0, 1, 2, 3, 4],
-        ["b", 0, 1, 2, 3, 4],
-        ["c", 0, 1, 2, 3, 4]
+        ["a", 0, 1, 2, 3, 4, args.num],
+        ["b", 0, 1, 2, 3, 4,5],
+        ["c", 0, 1, 2, 3, 4,5]
 	]
+
+
+
 
 	return {
 		outputs: {
@@ -30,4 +58,3 @@ wf.body(func(args) {
 		exports: {}
 	}
 })
-

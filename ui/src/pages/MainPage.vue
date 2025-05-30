@@ -34,10 +34,8 @@ const result = computed(() => {
       v-model="app.model.args.dataset"
     />
     <PlTextField
-      label="Input number"
+      label="Input points number"
       v-model="app.model.args.num"
-      :rules="app.model.args.numRules"
-      :required="true"
     /><!--todo: how to show validation error?-->
 
     <!-- Table for clnsCounts -->
