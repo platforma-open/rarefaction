@@ -19,7 +19,7 @@ const settingsOpen = ref(false);
   <PlBlockPage>
     <PlTextField v-model="app.model.args.name" label="Enter your name" :clearable="() => undefined" />
 
-    <PlAlert v-if="app.model.outputs.debugStdout" type="success"> {{ app.model.outputs.rarefactionPframe }} </PlAlert>
+    <PlAlert v-if="app.model.outputs.rarefactionPframe" type="success"> {{ app.model.outputs.rarefactionPframe }} </PlAlert>
 
     <template #title>Rere??? Block</template>
 

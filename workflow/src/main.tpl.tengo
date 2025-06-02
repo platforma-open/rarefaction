@@ -10,19 +10,24 @@ getColumns := func(datasetSpec) {
   return {
     axes: [
       {
+        column: "pl7_app_sampleId",
+        spec: datasetSpec.axesSpec[0]
+      },
+      {
         column: "clonotypeKey",
         spec: datasetSpec.axesSpec[1]
-      }],
+      }
+    ],
     columns: [
       {
-        column: "top",
-        id: "link",
+        column: "abundance",
+        id: "abundance",
         spec: {
-          name: "pl7.app/vdj/sampling-column",
+          name: "pl7.app/abundance",
           valueType: "Int",
           domain: {},
           annotations: {
-            "pl7.app/label": "Sampling column",
+            "pl7.app/label": "abundance",
             "pl7.app/table/visibility": "optional",
             "pl7.app/isSubset": "true"
           }
@@ -79,7 +84,6 @@ wf.body(func(args) {
 
     // todo: add format
     rarefactionPframe := xsv.importFile(rarefactionCmd.getFile(outfile), "tsv", getColumns(datasetSpec))
-
 
 	return {
 		outputs: {
