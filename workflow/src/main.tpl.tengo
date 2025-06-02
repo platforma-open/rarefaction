@@ -4,40 +4,9 @@ assets := import("@platforma-sdk/workflow-tengo:assets")
 ll := import("@platforma-sdk/workflow-tengo:ll")
 pframes := import("@platforma-sdk/workflow-tengo:pframes")
 xsv := import("@platforma-sdk/workflow-tengo:pframes.xsv")
+abundanceColsConv := import(":abundance-cols-conv")
 
 
-getColumns := func(datasetSpec) {
-  return {
-    axes: [
-      {
-        column: "pl7_app_sampleId",
-        spec: datasetSpec.axesSpec[0]
-      },
-      {
-        column: "clonotypeKey",
-        spec: datasetSpec.axesSpec[1]
-      }
-    ],
-    columns: [
-      {
-        column: "abundance",
-        id: "abundance",
-        spec: {
-          name: "pl7.app/abundance",
-          valueType: "Int",
-          domain: {},
-          annotations: {
-            "pl7.app/label": "abundance",
-            "pl7.app/table/visibility": "optional",
-            "pl7.app/isSubset": "true"
-          }
-        }
-      }
-    ],
-    storageFormat: "Binary",
-    partitionKeyLength: 0
-  }
-}
 
 
 wf.prepare(func(args) {
@@ -83,12 +52,12 @@ wf.body(func(args) {
 		run()
 
     // todo: add format
-    rarefactionPframe := xsv.importFile(rarefactionCmd.getFile(outfile), "tsv", getColumns(datasetSpec))
+    rarefactionPframe := xsv.importFile(rarefactionCmd.getFile(outfile), "tsv", abundanceColsConv.getColumns(datasetSpec))
 
 	return {
 		outputs: {
 			debugStdout: out,
-			rarefactionPframe: rarefactionPframe
+			rarefactionPframe: pframes.exportFrame(rarefactionPframe)
 		},
 
 		exports: {}

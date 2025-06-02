@@ -5,7 +5,7 @@ import {
   PlBtnGhost, PlDropdownRef, PlDropdown,
   PlMaskIcon24,
   PlSlideModal,
-  PlTextField
+  PlTextField, PlAgDataTableV2, PlAgDataTableSettings
 } from '@platforma-sdk/ui-vue';
 import { useApp } from '../app';
 import { ref, computed } from 'vue'; // Added computed
@@ -13,13 +13,17 @@ import { ref, computed } from 'vue'; // Added computed
 const app = useApp();
 const settingsOpen = ref(false);
 
+const tableSettings = computed<PlAgDataTableSettings>(() => (
+  app.model.outputs.table
+    ? { sourceType: 'ptable', model: app.model.outputs.table }
+    : undefined
+));
+
 </script>
 
 <template>
   <PlBlockPage>
     <PlTextField v-model="app.model.args.name" label="Enter your name" :clearable="() => undefined" />
-
-    <PlAlert v-if="app.model.outputs.rarefactionPframe" type="success"> {{ app.model.outputs.rarefactionPframe }} </PlAlert>
 
     <template #title>Rere??? Block</template>
 
@@ -33,11 +37,27 @@ const settingsOpen = ref(false);
       v-model="app.model.args.num"
     /><!--todo: how to show validation error?-->
 
+    <!--    <PlAgDataTableV2-->
+    <!--      v-model="app.model.ui.tableState"-->
+    <!--      v-model:selection="selection"-->
+    <!--      :settings="tableSettings"-->
+    <!--      show-columns-panel-->
+    <!--      show-export-button-->
+    <!--      @columns-changed="(newColumns) => (columns = newColumns)"-->
+    <!--    />-->
+    <PlAgDataTableV2
+      v-model="app.model.ui.tableState"
+      :settings="tableSettings"
+      show-columns-panel
+      show-export-button
+    />
+
+
     <!-- Settings -->
     <template #append>
       <PlBtnGhost @click.stop="() => settingsOpen = true">Settings
         <template #append>
-          <PlMaskIcon24 name="settings"/>
+          <PlMaskIcon24 name="settings" />
         </template>
       </PlBtnGhost>
     </template>

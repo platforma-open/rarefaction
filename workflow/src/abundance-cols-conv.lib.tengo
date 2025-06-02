@@ -1,0 +1,41 @@
+ll := import("@platforma-sdk/workflow-tengo:ll")
+maps := import("@platforma-sdk/workflow-tengo:maps")
+
+getColumns := func(datasetSpec) {
+  return {
+    axes: [
+      {
+        column: "pl7_app_sampleId",
+        spec: datasetSpec.axesSpec[0]
+      },
+      {
+        column: "clonotypeKey",
+        spec: maps.deepMerge(datasetSpec.axesSpec[1], {annotations: {
+                                                                 "pl7.app/table/visibility": "default"
+                                                               }}
+       )
+      }
+    ],
+    columns: [
+      {
+        column: "abundance",
+        id: "abundance",
+        spec: {
+          name: "pl7.app/abundance",
+          valueType: "Int",
+          domain: {},
+          annotations: {
+            "pl7.app/label": "abundance",
+            "pl7.app/table/visibility": "default"
+          }
+        }
+      }
+    ],
+    storageFormat: "Binary",
+    partitionKeyLength: 0
+  }
+}
+
+export ll.toStrict({
+	getColumns: getColumns
+})
