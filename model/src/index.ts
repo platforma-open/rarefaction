@@ -54,7 +54,7 @@ export const model = BlockModel.create()
   /*************************
    *        OUTPUTS        *
    *************************/
-  .output('result', (ctx) => ctx.outputs?.resolve('result')?.getDataAsJson())
+  .output('rarefactionPframe', (ctx) => ctx.outputs?.resolve('rarefactionPframe')?.getDataAsJson())
   // Get MiXCR outputs from the result pool
   .output('datasetOptions', (ctx) =>
     ctx.resultPool.getOptions([{

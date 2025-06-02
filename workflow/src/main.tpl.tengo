@@ -3,6 +3,37 @@ exec := import("@platforma-sdk/workflow-tengo:exec")
 assets := import("@platforma-sdk/workflow-tengo:assets")
 ll := import("@platforma-sdk/workflow-tengo:ll")
 pframes := import("@platforma-sdk/workflow-tengo:pframes")
+xsv := import("@platforma-sdk/workflow-tengo:pframes.xsv")
+
+
+getColumns := func(datasetSpec) {
+  return {
+    axes: [
+      {
+        column: "clonotypeKey",
+        spec: datasetSpec.axesSpec[1]
+      }],
+    columns: [
+      {
+        column: "top",
+        id: "link",
+        spec: {
+          name: "pl7.app/vdj/sampling-column",
+          valueType: "Int",
+          domain: {},
+          annotations: {
+            "pl7.app/label": "Sampling column",
+            "pl7.app/table/visibility": "optional",
+            "pl7.app/isSubset": "true"
+          }
+        }
+      }
+    ],
+    storageFormat: "Binary",
+    partitionKeyLength: 0
+  }
+}
+
 
 wf.prepare(func(args) {
 	bundleBuilder := wf.createPBundleBuilder()
@@ -26,6 +57,10 @@ wf.prepare(func(args) {
 })
 
 wf.body(func(args) {
+    infile := "input.tsv"
+    outfile := "rarefaction-output.tsv"
+    out := ""
+    cacheMins := 15
 
 	datasetSpec := args.columns.getSpec(args.datasetRef)
     tsvBuilder := pframes.tsvFileBuilder()
@@ -33,25 +68,23 @@ wf.body(func(args) {
     tsvBuilder.setAxisHeader(datasetSpec.axesSpec[1].name, "clonotypeKey")
     tsv := tsvBuilder.build()
 
-	python := exec.builder().
+	rarefactionCmd := exec.builder().
 		software(assets.importSoftware("@platforma-open/milaboratories.rereblock.software:main")).
-        addFile("input.tsv", tsv).
-		arg("input.tsv").
-		saveStdoutContent().
+		arg(infile).             // INPUT_TSV_FILEPATH
+        addFile(infile, tsv).    // INPUT_TSV_FILEPATH
+		arg(outfile).            // OUTPUT_TSV_FILEPATH
+        saveFile(outfile).
+        cacheMinutes(cacheMins).
 		run()
-	out := python.getStdoutFileContent()
 
-	clones := [
-        ["a", 0, 1, 2, 3, 4, args.num],
-        ["b", 0, 1, 2, 3, 4,5],
-        ["c", 0, 1, 2, 3, 4,5]
-	]
+    // todo: add format
+    rarefactionPframe := xsv.importFile(rarefactionCmd.getFile(outfile), "tsv", getColumns(datasetSpec))
+
 
 	return {
 		outputs: {
 			debugStdout: out,
-			result: clones
-
+			rarefactionPframe: rarefactionPframe
 		},
 
 		exports: {}
