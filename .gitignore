@@ -5,6 +5,7 @@ block-pack/
 dev/
 work/
 log/
+venv/
 .turbo
 vite.config.*.timestamp-*
 software/**/*.sw.json

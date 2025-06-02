@@ -174,7 +174,7 @@ importers:
 
   workflow:
     dependencies:
-      '@platforma-open/platforma-open.rereblock.software':
+      '@platforma-open/milaboratories.rereblock.software':
         specifier: workspace:*
         version: link:../software
       '@platforma-sdk/workflow-tengo':

@@ -1,4 +1,11 @@
-import { deriveLabels, InferOutputsType, isPColumnSpecResult, PlRef, readOutput } from '@platforma-sdk/model';
+import {
+  deriveLabels,
+  InferOutputsType,
+  isPColumnSpecResult, parseResourceMap,
+  PlRef,
+  readOutput,
+  RenderCtx
+} from '@platforma-sdk/model';
 import { BlockModel } from '@platforma-sdk/model';
 
 
@@ -30,6 +37,7 @@ function numRuleError(num: string | undefined): boolean | string {
 }
 
 
+// @ts-ignore
 /*************************
  *         MODEL         *
  *************************/
@@ -46,8 +54,6 @@ export const model = BlockModel.create()
   /*************************
    *        OUTPUTS        *
    *************************/
-  .output('tengoMessage', (ctx) => ctx.outputs?.resolve('tengoMessage')?.getDataAsJson())
-  // .output('pythonMessage', (ctx) => ctx.outputs?.resolve('pythonMessage')?.getDataAsString())
   .output('result', (ctx) => ctx.outputs?.resolve('result')?.getDataAsJson())
   // Get MiXCR outputs from the result pool
   .output('datasetOptions', (ctx) =>
@@ -60,14 +66,13 @@ export const model = BlockModel.create()
       }, {
         axes: [
           { name: 'pl7.app/sampleId' },
-          { name: 'pl7.app/vdj/scClonotypeKey' }
+          { "name": "pl7.app/vdj/scClonotypeKey" }
         ],
         annotations: { 'pl7.app/isAnchor': 'true' }
-      }]
-      /*      {
-              // suppress native label of the column (e.g. "Number of Reads") to show only the dataset label
-              label: { includeNativeLabel: false },
-            }*/)
+      }])
+  )
+  .output('debugStdout', (ctx) =>
+    ctx.outputs?.resolve('debugStdout')?.getDataAsString()
   )
 
 

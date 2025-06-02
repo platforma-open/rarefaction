@@ -24,7 +24,7 @@ const result = computed(() => {
   <PlBlockPage>
     <PlTextField v-model="app.model.args.name" label="Enter your name" :clearable="() => undefined" />
 
-    <PlAlert v-if="app.model.outputs.tengoMessage" type="success"> {{ app.model.outputs.tengoMessage }} </PlAlert>
+    <PlAlert v-if="app.model.outputs.debugStdout" type="success"> {{ app.model.outputs.debugStdout }} </PlAlert>
 
     <template #title>Rere??? Block</template>
 

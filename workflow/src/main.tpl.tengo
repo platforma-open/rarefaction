@@ -1,15 +1,14 @@
-// "hello world"
 wf := import("@platforma-sdk/workflow-tengo:workflow")
 exec := import("@platforma-sdk/workflow-tengo:exec")
-assets:= import("@platforma-sdk/workflow-tengo:assets")
-ll:= import("@platforma-sdk/workflow-tengo:ll")
+assets := import("@platforma-sdk/workflow-tengo:assets")
+ll := import("@platforma-sdk/workflow-tengo:ll")
+pframes := import("@platforma-sdk/workflow-tengo:pframes")
 
 wf.prepare(func(args) {
 	bundleBuilder := wf.createPBundleBuilder()
 	bundleBuilder.ignoreMissingDomains() // to make query work for both bulk and single cell data
 	bundleBuilder.addAnchor("main", args.datasetRef)
 
-	// abundance
 	bundleBuilder.addSingle({
 		axes: [ { anchor: "main", idx: 0 }, { anchor: "main", idx: 1 }],
 		annotations: {
@@ -23,34 +22,34 @@ wf.prepare(func(args) {
 
 	return {
 		columns: bundleBuilder.build()
-		}
+    }
 })
 
 wf.body(func(args) {
-//	python := exec.builder().
-//		software(assets.importSoftware("@platforma-open/platforma-open.rereblock.software:hello-world-python")).
-//		arg(args.name).
-//		saveStdoutContent().
-//		run()
-//	pythonMessage := python.getStdoutFileContent()
-	pythonMessage := "python.getStdoutFileContent()"
 
-	ll.panic("", args.columns)
+	datasetSpec := args.columns.getSpec(args.datasetRef)
+    tsvBuilder := pframes.tsvFileBuilder()
+    tsvBuilder.add(args.columns.getColumn("abundance"), {header: "abundance"})
+    tsvBuilder.setAxisHeader(datasetSpec.axesSpec[1].name, "clonotypeKey")
+    tsv := tsvBuilder.build()
 
-	tengoMessage := "Hello from Tengo, " + args.name + "!"
+	python := exec.builder().
+		software(assets.importSoftware("@platforma-open/milaboratories.rereblock.software:main")).
+        addFile("input.tsv", tsv).
+		arg("input.tsv").
+		saveStdoutContent().
+		run()
+	out := python.getStdoutFileContent()
+
 	clones := [
         ["a", 0, 1, 2, 3, 4, args.num],
         ["b", 0, 1, 2, 3, 4,5],
         ["c", 0, 1, 2, 3, 4,5]
 	]
 
-
-
-
 	return {
 		outputs: {
-			pythonMessage: pythonMessage,
-			tengoMessage: tengoMessage,
+			debugStdout: out,
 			result: clones
 
 		},
