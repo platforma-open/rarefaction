@@ -27,6 +27,8 @@ const tableSettings = computed<PlAgDataTableSettings>(() => (
 
     <template #title>Rere??? Block</template>
 
+    <PlAlert type="success" v-if="app.model.outputs.rarefactionPframe">{{app.model.outputs.table}}</PlAlert>
+
     <PlDropdownRef
       label="Select dataset"
       :options="app.model.outputs.datasetOptions"
@@ -37,19 +39,9 @@ const tableSettings = computed<PlAgDataTableSettings>(() => (
       v-model="app.model.args.num"
     /><!--todo: how to show validation error?-->
 
-    <!--    <PlAgDataTableV2-->
-    <!--      v-model="app.model.ui.tableState"-->
-    <!--      v-model:selection="selection"-->
-    <!--      :settings="tableSettings"-->
-    <!--      show-columns-panel-->
-    <!--      show-export-button-->
-    <!--      @columns-changed="(newColumns) => (columns = newColumns)"-->
-    <!--    />-->
     <PlAgDataTableV2
       v-model="app.model.ui.tableState"
       :settings="tableSettings"
-      show-columns-panel
-      show-export-button
     />
 
 

@@ -53,6 +53,9 @@ export const model = BlockModel.create()
   /*************************
    *        OUTPUTS        *
    *************************/
+  .output('rarefactionPframe', (ctx) => {
+    return ctx.outputs?.resolve('rarefactionPframe');
+  })
   .output('table', (ctx) => {
     const cols = ctx.outputs?.resolve('rarefactionPframe')?.getPColumns();
     if (cols === undefined) {
@@ -63,11 +66,25 @@ export const model = BlockModel.create()
       ctx,
       cols,
       // if there are links, we need to pick one of the links to show all axes in the table
-      (spec) => true,
+      (spec) => {
+        return spec.name === "pl7.app/mean_unique_clonotypes";
+      },
       ctx.uiState.tableState,
       undefined
     );
   })
+  .output('table_debug', (ctx) => {
+    const cols = ctx.outputs?.resolve('rarefactionPframe')?.getPColumns();
+    if (cols === undefined) {
+      return undefined;
+    }
+
+    return cols.map((c) => ({
+      id: c.id,
+      spec: c.spec
+    }));
+  })
+
 
 
 
