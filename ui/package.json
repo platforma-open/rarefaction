@@ -10,8 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@milaboratories/graph-maker": "^1.1.109",
+    "@milaboratories/graph-maker": "catalog:",
     "@platforma-open/platforma-open.rarefaction.model": "workspace:*",
+    "@platforma-sdk/model": "catalog:",
     "@platforma-sdk/ui-vue": "catalog:",
     "vue": "catalog:"
   },

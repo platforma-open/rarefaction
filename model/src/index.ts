@@ -5,7 +5,7 @@ import { BlockModel, createPFrameForGraphs, createPlDataTableV2 } from '@platfor
 // validation rules
 function numRule(num: string | undefined): boolean {
   const numValue = Number(num);
-  return numValue > 0 && numValue < 100;
+  return numValue > 0 && numValue < 10000;
 }
 
 function numRuleError(num: string | undefined): boolean | string {
@@ -16,10 +16,10 @@ function numRuleError(num: string | undefined): boolean | string {
 }
 
 export type BlockArgs = {
-  num: string;
-  name?: string; // todo cleanup code
+  numPoints: string;
+  numIterations: string;
   datasetRef?: PlRef;
-  numRules?: ((num: string) => boolean | string)[]; // todo cleanup
+  numRules?: ((num: string) => boolean | string)[]; // todo find a way to show text field err
 };
 
 export type UiState = {
@@ -38,7 +38,8 @@ export const model = BlockModel.create()
    *************************/
   .withArgs<BlockArgs>({
     numRules: [numRuleError],
-    num: '20',
+    numPoints: '20',
+    numIterations: '100',
   })
 
   /*************************
@@ -59,16 +60,20 @@ export const model = BlockModel.create()
     },
   },
   )
-  .argsValid((ctx) => (ctx.args.datasetRef !== undefined && numRule(ctx.args.num)))
+  .argsValid((ctx) => (
+    ctx.args.datasetRef !== undefined
+    && numRule(ctx.args.numPoints)
+    && numRule(ctx.args.numIterations)
+  ))
 
   /*************************
    *        OUTPUTS        *
    *************************/
-  .output('rarefactionGraphPframe', (ctx) => {
-    return createPFrameForGraphs(ctx, ctx.outputs?.resolve('rarefactionPframe')?.getPColumns());
+  .output('graphPFrame', (ctx) => {
+    return createPFrameForGraphs(ctx, ctx.outputs?.resolve('exportedPFrame')?.getPColumns());
   })
   .output('table', (ctx) => {
-    const cols = ctx.outputs?.resolve('rarefactionPframe')?.getPColumns();
+    const cols = ctx.outputs?.resolve('exportedPFrame')?.getPColumns();
     if (cols === undefined) {
       return undefined;
     }
@@ -100,9 +105,6 @@ export const model = BlockModel.create()
       ],
       annotations: { 'pl7.app/isAnchor': 'true' },
     }]),
-  )
-  .output('debugStdout', (ctx) =>
-    ctx.outputs?.resolve('debugStdout')?.getFileContentAsString(),
   )
   .output('debugStdoutStream', (ctx) =>
     ctx.outputs?.resolve('debugStdoutStream')?.getLogHandle(),

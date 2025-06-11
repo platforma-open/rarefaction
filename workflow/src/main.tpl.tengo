@@ -32,9 +32,10 @@ wf.prepare(func(args) {
 })
 
 wf.body(func(args) {
-    infile := "input.tsv"
+    infile := "rarefaction-input.tsv"
     outfile := "rarefaction-output.tsv"
-    numPoints := "--num-points=" + args.num
+    numPoints := "--num-points=" + args.numPoints
+    numIterations := "--num-iterations=" + args.numIterations
     cacheMins := 15
 
 	datasetSpec := args.columns.getSpec(args.datasetRef)
@@ -49,18 +50,20 @@ wf.body(func(args) {
         addFile(infile, tsv).    // INPUT_TSV_FILEPATH
 		arg(outfile).            // OUTPUT_TSV_FILEPATH
         arg(numPoints).          // NUM_POINTS
+        arg(numIterations).      // NUM_ITERATIONS
         saveFile(outfile).
         cacheMinutes(cacheMins).
         printErrStreamToStdout().
 		run()
 
-    // todo: add format
-    rarefactionPframe := pframes.exportFrame(xsv.importFile(rarefactionCmd.getFile(outfile), "tsv", abundanceColsConv.getColumns(datasetSpec)))
-
+    // { axes: ["pl7_app_sampleId":string, "subsampling_depth":int], columns: ["mean_unique_clonotypes":float]}
+    rawPFrame := xsv.importFile(rarefactionCmd.getFile(outfile), "tsv", abundanceColsConv.getColumns(datasetSpec))
+    exportedPFrame := pframes.exportFrame(rawPFrame)
 	return {
 		outputs: {
 			debugStdoutStream: rarefactionCmd.getStdoutStream(),
-			rarefactionPframe: rarefactionPframe
+			rawPFrame: rawPFrame,
+			exportedPFrame: exportedPFrame
 		},
 
 		exports: {

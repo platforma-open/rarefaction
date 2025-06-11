@@ -158,6 +158,9 @@ importers:
       '@platforma-open/platforma-open.rarefaction.model':
         specifier: workspace:*
         version: link:../model
+      '@platforma-sdk/model':
+        specifier: ^1.33.14
+        version: 1.33.14
       '@platforma-sdk/ui-vue':
         specifier: 'catalog:'
         version: 1.33.14(d3-dispatch@3.0.1)(d3-path@3.1.0)(d3-scale-chromatic@3.1.0)(typescript@5.5.4)

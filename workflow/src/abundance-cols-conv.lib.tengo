@@ -2,7 +2,6 @@ ll := import("@platforma-sdk/workflow-tengo:ll")
 maps := import("@platforma-sdk/workflow-tengo:maps")
 
 // pl7_app_sampleId, subsampling_depth, mean_unique_clonotypes
-// todo: check with Stas
 getColumns := func(datasetSpec) {
   return {
     axes: [
