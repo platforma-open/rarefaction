@@ -156,8 +156,7 @@ def run_rarefaction(input_tsv_filepath, output_tsv_filepath, num_points, num_ite
     rarefaction_results = []
 
     if not samples_data:
-        click.echo("No valid data found in the input file to process after the header.", err=True)
-        sys.exit(1) #todo: opa!
+        click.echo("No valid data found in the input file to process after the header.")
 
     else:
         click.echo(f"Found data for {len(samples_data)} samples.")

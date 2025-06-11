@@ -205,21 +205,9 @@ class TestRunRarefactionCLI:
         output_file = tmp_path / "output_empty.tsv"
 
         result = runner.invoke(run_rarefaction, [str(input_file), str(output_file)])
-        assert result.exit_code == 1, result.output
+        assert result.exit_code == 0, result.output
         assert "No valid data found in the input file to process after the header." in result.output
-        assert not output_file.exists()
-
-    def test_only_header_in_file(self, tmp_path):
-        runner = CliRunner()
-        input_file_path = tmp_path / "only_header.tsv"
-        with open(input_file_path, 'w') as f:
-            f.write(f"{SIMPLE_HEADER[0]}\t{SIMPLE_HEADER[1]}\t{SIMPLE_HEADER[2]}\n")
-
-        output_file = tmp_path / "output_only_header.tsv"
-        result = runner.invoke(run_rarefaction, [str(input_file_path), str(output_file)])
-        assert result.exit_code == 1, result.output
-        assert "No valid data found in the input file to process after the header." in result.output
-        assert not output_file.exists()
+        assert output_file.exists()
 
     def test_malformed_row_less_columns(self, create_tsv_file, tmp_path):
         runner = CliRunner()
@@ -230,7 +218,7 @@ class TestRunRarefactionCLI:
         result = runner.invoke(run_rarefaction, [str(input_file), str(output_file)])
         assert "Warning: Row 1 (after header): Expected at least 3 columns" in result.output
         assert "No valid data found" in result.output
-        assert result.exit_code == 1
+        assert result.exit_code == 0
 
     def test_malformed_row_bad_abundance(self, create_tsv_file, tmp_path):
         runner = CliRunner()
@@ -241,7 +229,7 @@ class TestRunRarefactionCLI:
         result = runner.invoke(run_rarefaction, [str(input_file), str(output_file)])
         assert "Warning: Row 1 (after header): Non-integer abundance 'not_a_number'" in result.output
         assert "No valid data found" in result.output
-        assert result.exit_code == 1
+        assert result.exit_code == 0
 
     def test_negative_abundance_skipped(self, create_tsv_file, tmp_path):
         runner = CliRunner()
