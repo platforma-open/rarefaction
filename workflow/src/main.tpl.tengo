@@ -55,7 +55,7 @@ wf.body(func(args) {
 		run()
 
     // todo: add format
-    rarefactionPframe := xsv.importFile(rarefactionCmd.getFile(outfile), "tsv", abundanceColsConv.getColumns(datasetSpec))
+    rarefactionPframe := pframes.exportFrame(xsv.importFile(rarefactionCmd.getFile(outfile), "tsv", abundanceColsConv.getColumns(datasetSpec)))
 
 	return {
 		outputs: {
