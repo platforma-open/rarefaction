@@ -1,11 +1,13 @@
-import { model } from '@platforma-open/platforma-open.rereblock.model';
+import { model } from '@platforma-open/platforma-open.rarefaction.model';
 import { defineApp } from '@platforma-sdk/ui-vue';
-import MainPage from './pages/MainPage.vue';
+import TablePage from './pages/TablePage.vue';
+import GraphPage from './pages/GraphPage.vue';
 
 export const sdkPlugin = defineApp(model, () => {
   return {
     routes: {
-      '/': () => MainPage,
+      '/': () => GraphPage,
+      '/table': () => TablePage,
     },
   };
 });

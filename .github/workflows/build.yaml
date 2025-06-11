@@ -11,7 +11,7 @@ on:
   workflow_dispatch: {}
 jobs:
   init:
-    if: github.repository != 'milaboratory/platforma-rereblock'
+    if: github.repository != 'milaboratory/platforma-rarefaction'
     runs-on: ubuntu-latest
     steps:
       - uses: milaboratory/github-ci/actions/context/init@v4
@@ -19,13 +19,13 @@ jobs:
           version-canonize: false
           branch-versioning: main
   run:
-    if: github.repository != 'milaboratory/platforma-rereblock'
+    if: github.repository != 'milaboratory/platforma-rarefaction'
     needs:
       - init
     uses: milaboratory/github-ci/.github/workflows/node-simple-pnpm.yaml@v4
     with:
-      app-name: 'Block: rereblock'
-      app-name-slug: 'block-rereblock'
+      app-name: 'Block: rarefaction'
+      app-name-slug: 'block-rarefaction'
       notify-telegram: true
       node-version: '20.x'
       build-script-name: 'build'

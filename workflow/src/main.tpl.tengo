@@ -4,6 +4,7 @@ assets := import("@platforma-sdk/workflow-tengo:assets")
 ll := import("@platforma-sdk/workflow-tengo:ll")
 pframes := import("@platforma-sdk/workflow-tengo:pframes")
 xsv := import("@platforma-sdk/workflow-tengo:pframes.xsv")
+file := import("@platforma-sdk/workflow-tengo:file")
 abundanceColsConv := import(":abundance-cols-conv")
 
 
@@ -33,7 +34,7 @@ wf.prepare(func(args) {
 wf.body(func(args) {
     infile := "input.tsv"
     outfile := "rarefaction-output.tsv"
-    out := ""
+    numPoints := "--num-points=" + args.num
     cacheMins := 15
 
 	datasetSpec := args.columns.getSpec(args.datasetRef)
@@ -43,12 +44,14 @@ wf.body(func(args) {
     tsv := tsvBuilder.build()
 
 	rarefactionCmd := exec.builder().
-		software(assets.importSoftware("@platforma-open/milaboratories.rereblock.software:main")).
+		software(assets.importSoftware("@platforma-open/milaboratories.rarefaction.software:main")).
 		arg(infile).             // INPUT_TSV_FILEPATH
         addFile(infile, tsv).    // INPUT_TSV_FILEPATH
 		arg(outfile).            // OUTPUT_TSV_FILEPATH
+        arg(numPoints).          // NUM_POINTS
         saveFile(outfile).
         cacheMinutes(cacheMins).
+        printErrStreamToStdout().
 		run()
 
     // todo: add format
@@ -56,10 +59,12 @@ wf.body(func(args) {
 
 	return {
 		outputs: {
-			debugStdout: out,
-			rarefactionPframe: pframes.exportFrame(rarefactionPframe)
+			debugStdoutStream: rarefactionCmd.getStdoutStream(),
+			rarefactionPframe: rarefactionPframe
 		},
 
-		exports: {}
+		exports: {
+//			rarefactionPframe: rarefactionPframe todo:fix with spec example
+		}
 	}
 })

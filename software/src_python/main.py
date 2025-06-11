@@ -97,7 +97,7 @@ def get_rarefaction_depths(total_abundance, num_points_requested):
 @click.option('--num-iterations', type=click.INT, default=100, show_default=True,
               help="Number of random subsamples for each rarefaction depth.")
 def run_rarefaction(input_tsv_filepath, output_tsv_filepath, num_points, num_iterations):
-    """
+    f"""
     Performs rarefaction analysis on clonotype data from a TSV file.
     The input TSV file MUST have a header row with columns:
     pl7_app_sampleId, clonotypeKey, abundance.
@@ -108,6 +108,8 @@ def run_rarefaction(input_tsv_filepath, output_tsv_filepath, num_points, num_ite
     The output TSV file will have columns: pl7_app_sampleId, subsampling_depth, mean_unique_clonotypes.
     Use '-' for OUTPUT_TSV_FILEPATH to print to standard output.
     """
+    click.echo(f"Approximate number of rarefaction depth points per sample: {num_points}")
+    click.echo(f"Number of iterations per depth: {num_iterations}")
     click.echo(f"Reading data from: {input_tsv_filepath}")
     samples_data = defaultdict(list)
 
@@ -151,68 +153,69 @@ def run_rarefaction(input_tsv_filepath, output_tsv_filepath, num_points, num_ite
         click.echo(f"Error reading input file: {e}", err=True)
         sys.exit(1)
 
-    if not samples_data:
-        click.echo("No valid data found in the input file to process after the header.", err=True)
-        sys.exit(1)
-
-    click.echo(f"Found data for {len(samples_data)} samples.")
-    click.echo(f"Performing rarefaction with ~{num_points} depth points and {num_iterations} iterations per depth...")
-
     rarefaction_results = []
 
-    for sample_id, clonotypes_with_abundances in samples_data.items():
-        expanded_clonotypes = []
-        for key, abund in clonotypes_with_abundances:
-            expanded_clonotypes.extend([key] * abund)
+    if not samples_data:
+        click.echo("No valid data found in the input file to process after the header.", err=True)
+        sys.exit(1) #todo: opa!
 
-        total_abundance = len(expanded_clonotypes)
+    else:
+        click.echo(f"Found data for {len(samples_data)} samples.")
+        click.echo(f"Performing rarefaction with ~{num_points} depth points and {num_iterations} iterations per depth...")
 
-        # click.echo(f"  Processing sample: {sample_id} (Total Abundance: {total_abundance})")
+        for sample_id, clonotypes_with_abundances in samples_data.items():
+            expanded_clonotypes = []
+            for key, abund in clonotypes_with_abundances:
+                expanded_clonotypes.extend([key] * abund)
 
-        current_rarefaction_depths = get_rarefaction_depths(total_abundance, num_points)
-        # click.echo(f"    Depths for {sample_id}: {current_rarefaction_depths}")
+            total_abundance = len(expanded_clonotypes)
 
+            # click.echo(f"  Processing sample: {sample_id} (Total Abundance: {total_abundance})")
 
-        for depth in current_rarefaction_depths:
-            if depth == 0:
-                mean_richness = 0.0
-                rarefaction_results.append([sample_id, 0, f"{mean_richness:.2f}"])
-                continue
-
-            if depth > total_abundance: # Should be rare due to get_rarefaction_depths logic
-                # This case might occur if total_abundance is 0 and depth is >0 (e.g. from a fixed set of depths)
-                # or if get_rarefaction_depths had an edge case.
-                # For a depth greater than available items, richness is max possible.
-                # However, standard rarefaction usually caps depth at total_abundance.
-                # Let's assume get_rarefaction_depths handles this, or we can skip.
-                # For safety, if this happens, we can report the richness at total_abundance
-                # or simply skip this depth point if it's an anomaly.
-                # Given current get_rarefaction_depths, this should not be an issue.
-                # If it were, we might do:
-                # num_unique_at_max = len(set(expanded_clonotypes))
-                # rarefaction_results.append([sample_id, depth, f"{float(num_unique_at_max):.2f}"])
-                continue
+            current_rarefaction_depths = get_rarefaction_depths(total_abundance, num_points)
+            # click.echo(f"    Depths for {sample_id}: {current_rarefaction_depths}")
 
 
-            current_depth_richness_values = []
-            if total_abundance > 0 and num_iterations > 0:
-                for _ in range(num_iterations):
-                    actual_k = min(depth, total_abundance)
-                    if actual_k == 0 :
-                        num_unique_clonotypes = 0
-                    else:
-                        subsample = random.sample(expanded_clonotypes, k=actual_k)
-                        num_unique_clonotypes = len(set(subsample))
-                    current_depth_richness_values.append(num_unique_clonotypes)
+            for depth in current_rarefaction_depths:
+                if depth == 0:
+                    mean_richness = 0.0
+                    rarefaction_results.append([sample_id, 0, f"{mean_richness:.2f}"])
+                    continue
 
-            if current_depth_richness_values:
-                mean_richness = sum(current_depth_richness_values) / len(current_depth_richness_values)
-            else:
-                mean_richness = 0.0
-                if depth > 0 and total_abundance > 0:
-                    pass
+                if depth > total_abundance: # Should be rare due to get_rarefaction_depths logic
+                    # This case might occur if total_abundance is 0 and depth is >0 (e.g. from a fixed set of depths)
+                    # or if get_rarefaction_depths had an edge case.
+                    # For a depth greater than available items, richness is max possible.
+                    # However, standard rarefaction usually caps depth at total_abundance.
+                    # Let's assume get_rarefaction_depths handles this, or we can skip.
+                    # For safety, if this happens, we can report the richness at total_abundance
+                    # or simply skip this depth point if it's an anomaly.
+                    # Given current get_rarefaction_depths, this should not be an issue.
+                    # If it were, we might do:
+                    # num_unique_at_max = len(set(expanded_clonotypes))
+                    # rarefaction_results.append([sample_id, depth, f"{float(num_unique_at_max):.2f}"])
+                    continue
 
-            rarefaction_results.append([sample_id, depth, f"{mean_richness:.2f}"])
+
+                current_depth_richness_values = []
+                if total_abundance > 0 and num_iterations > 0:
+                    for _ in range(num_iterations):
+                        actual_k = min(depth, total_abundance)
+                        if actual_k == 0 :
+                            num_unique_clonotypes = 0
+                        else:
+                            subsample = random.sample(expanded_clonotypes, k=actual_k)
+                            num_unique_clonotypes = len(set(subsample))
+                        current_depth_richness_values.append(num_unique_clonotypes)
+
+                if current_depth_richness_values:
+                    mean_richness = sum(current_depth_richness_values) / len(current_depth_richness_values)
+                else:
+                    mean_richness = 0.0
+                    if depth > 0 and total_abundance > 0:
+                        pass
+
+                rarefaction_results.append([sample_id, depth, f"{mean_richness:.2f}"])
 
     click.echo(f"Writing results to: {output_tsv_filepath}")
     try:

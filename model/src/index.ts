@@ -1,5 +1,6 @@
-import { BlockModel, createPlDataTableV2, InferOutputsType, PlDataTableState, PlRef } from '@platforma-sdk/model';
-
+import type { GraphMakerState } from '@milaboratories/graph-maker';
+import type { InferOutputsType, PlDataTableState, PlRef } from '@platforma-sdk/model';
+import { BlockModel, createPFrameForGraphs, createPlDataTableV2 } from '@platforma-sdk/model';
 
 // validation rules
 function numRule(num: string | undefined): boolean {
@@ -14,19 +15,18 @@ function numRuleError(num: string | undefined): boolean | string {
   return true;
 }
 
-
 export type BlockArgs = {
-  num?: string;
-  name?: string;
+  num: string;
+  name?: string; // todo cleanup code
   datasetRef?: PlRef;
-  numRules?: ((num: string) => boolean | string)[];
+  numRules?: ((num: string) => boolean | string)[]; // todo cleanup
 };
 
 export type UiState = {
   title?: string;
   tableState: PlDataTableState;
-}
-
+  graphState: GraphMakerState;
+};
 
 /*************************
  *         MODEL         *
@@ -37,7 +37,8 @@ export const model = BlockModel.create()
    *          ARGS         *
    *************************/
   .withArgs<BlockArgs>({
-    numRules: [numRuleError]
+    numRules: [numRuleError],
+    num: '20',
   })
 
   /*************************
@@ -45,16 +46,26 @@ export const model = BlockModel.create()
    *************************/
   .withUiState<UiState>({
     tableState: {
-      gridState: {}
-    }
-  })
+      gridState: {},
+    },
+    graphState: {
+      title: 'Rarefaction',
+      template: 'line_binnedDots',
+      // layersSettings: {
+      //   dots: {
+      //     dotFill: '#5d32c6',
+      //   },
+      // },
+    },
+  },
+  )
   .argsValid((ctx) => (ctx.args.datasetRef !== undefined && numRule(ctx.args.num)))
 
   /*************************
    *        OUTPUTS        *
    *************************/
-  .output('rarefactionPframe', (ctx) => {
-    return ctx.outputs?.resolve('rarefactionPframe');
+  .output('rarefactionGraphPframe', (ctx) => {
+    return createPFrameForGraphs(ctx, ctx.outputs?.resolve('rarefactionPframe')?.getPColumns());
   })
   .output('table', (ctx) => {
     const cols = ctx.outputs?.resolve('rarefactionPframe')?.getPColumns();
@@ -70,49 +81,40 @@ export const model = BlockModel.create()
         return spec.name === "pl7.app/mean_unique_clonotypes";
       },
       ctx.uiState.tableState,
-      undefined
+      undefined,
     );
   })
-  .output('table_debug', (ctx) => {
-    const cols = ctx.outputs?.resolve('rarefactionPframe')?.getPColumns();
-    if (cols === undefined) {
-      return undefined;
-    }
-
-    return cols.map((c) => ({
-      id: c.id,
-      spec: c.spec
-    }));
-  })
-
-
-
 
   // Get MiXCR outputs from the result pool
   .output('datasetOptions', (ctx) =>
     ctx.resultPool.getOptions([{
       axes: [
         { name: 'pl7.app/sampleId' },
-        { name: 'pl7.app/vdj/clonotypeKey' }
+        { name: 'pl7.app/vdj/clonotypeKey' },
       ],
-      annotations: { 'pl7.app/isAnchor': 'true' }
+      annotations: { 'pl7.app/isAnchor': 'true' },
     }, {
       axes: [
         { name: 'pl7.app/sampleId' },
-        { 'name': 'pl7.app/vdj/scClonotypeKey' }
+        { name: 'pl7.app/vdj/scClonotypeKey' },
       ],
-      annotations: { 'pl7.app/isAnchor': 'true' }
-    }])
+      annotations: { 'pl7.app/isAnchor': 'true' },
+    }]),
   )
   .output('debugStdout', (ctx) =>
-    ctx.outputs?.resolve('debugStdout')?.getDataAsString()
+    ctx.outputs?.resolve('debugStdout')?.getFileContentAsString(),
   )
-
+  .output('debugStdoutStream', (ctx) =>
+    ctx.outputs?.resolve('debugStdoutStream')?.getLogHandle(),
+  )
 
   /*************************
    *        SECTIONS       *
    *************************/
-  .sections((_ctx) => [{ type: 'link', href: '/', label: 'Main' }])
+  .sections((_ctx) => [
+    { type: 'link', href: '/', label: 'Graph' },
+    { type: 'link', href: '/table', label: 'Table' }
+  ])
   .done();
 
 export type BlockOutputs = InferOutputsType<typeof model>;

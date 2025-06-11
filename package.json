@@ -1,5 +1,5 @@
 {
-  "name": "@platforma-open/platforma-open.rereblock",
+  "name": "@platforma-open/platforma-open.rarefaction",
   "version": "1.0.0",
   "scripts": {
     "pretty": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json,vue}\"",

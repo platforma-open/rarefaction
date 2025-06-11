@@ -1,5 +1,5 @@
 {
-  "name": "@platforma-open/platforma-open.rereblock.ui",
+  "name": "@platforma-open/platforma-open.rarefaction.ui",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
@@ -10,15 +10,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@platforma-open/platforma-open.rereblock.model": "workspace:*",
+    "@milaboratories/graph-maker": "^1.1.109",
+    "@platforma-open/platforma-open.rarefaction.model": "workspace:*",
     "@platforma-sdk/ui-vue": "catalog:",
     "vue": "catalog:"
   },
   "devDependencies": {
+    "@platforma-sdk/eslint-config": "catalog:",
     "@vitejs/plugin-vue": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "vue-tsc": "catalog:",
-    "@platforma-sdk/eslint-config": "catalog:"
+    "vue-tsc": "catalog:"
   }
 }

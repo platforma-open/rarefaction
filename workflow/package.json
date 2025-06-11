@@ -1,5 +1,5 @@
 {
-  "name": "@platforma-open/platforma-open.rereblock.workflow",
+  "name": "@platforma-open/platforma-open.rarefaction.workflow",
   "version": "1.0.0",
   "type": "module",
   "description": "Block Workflow",
@@ -9,7 +9,7 @@
     "format": "/usr/bin/env emacs --script ./format.el"
   },
   "dependencies": {
-    "@platforma-open/milaboratories.rereblock.software": "workspace:*",
+    "@platforma-open/milaboratories.rarefaction.software": "workspace:*",
     "@platforma-sdk/workflow-tengo": "catalog:"
   },
   "devDependencies": {

@@ -1,5 +1,5 @@
 {
-  "name": "@platforma-open/platforma-open.rereblock.test",
+  "name": "@platforma-open/platforma-open.rarefaction.test",
   "private": true,
   "version": "1.0.0",
   "description": "Block tests",
@@ -10,7 +10,7 @@
   "files": [],
   "keywords": [],
   "dependencies": {
-    "this-block": "workspace:@platforma-open/platforma-open.rereblock@*"
+    "this-block": "workspace:@platforma-open/platforma-open.rarefaction@*"
   },
   "devDependencies": {
     "@platforma-sdk/test": "catalog:",

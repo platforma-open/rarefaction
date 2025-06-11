@@ -1,5 +1,5 @@
 {
-  "name": "@platforma-open/platforma-open.rereblock",
+  "name": "@platforma-open/platforma-open.rarefaction",
   "version": "1.0.0",
   "scripts": {
     "pretty": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json,vue}\"",
@@ -14,20 +14,20 @@
   ],
   "dependencies": {
     "@platforma-sdk/model": "catalog:",
-    "@platforma-open/platforma-open.rereblock.workflow": "workspace:*",
-    "@platforma-open/platforma-open.rereblock.model": "workspace:*",
-    "@platforma-open/platforma-open.rereblock.ui": "workspace:*"
+    "@platforma-open/platforma-open.rarefaction.workflow": "workspace:*",
+    "@platforma-open/platforma-open.rarefaction.model": "workspace:*",
+    "@platforma-open/platforma-open.rarefaction.ui": "workspace:*"
   },
   "block": {
     "components": {
-      "workflow": "@platforma-open/platforma-open.rereblock.workflow/dist/tengo/tpl/main.plj.gz",
-      "model": "@platforma-open/platforma-open.rereblock.model/dist/model.json",
-      "ui": "@platforma-open/platforma-open.rereblock.ui/dist"
+      "workflow": "@platforma-open/platforma-open.rarefaction.workflow/dist/tengo/tpl/main.plj.gz",
+      "model": "@platforma-open/platforma-open.rarefaction.model/dist/model.json",
+      "ui": "@platforma-open/platforma-open.rarefaction.ui/dist"
     },
     "meta": {
-      "title": "Block Title",
+      "title": "Rarefaction",
       "logo": "file:../logos/block-logo.png",
-      "url": "https://github.com/platforma-open/platforma-open.rereblock",
+      "url": "https://github.com/platforma-open/platforma-open.rarefaction",
       "support": "mailto:support@milaboratories.com",
       "description": "Simple Hello World block that can be used as a boilerplate for newly created blocks.",
       "longDescription": "file:../docs/description.md",
