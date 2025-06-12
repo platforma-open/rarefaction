@@ -71,6 +71,7 @@ export const model = BlockModel.create()
    *************************/
   .output('graphPFrame', (ctx) => {
     return createPFrameForGraphs(ctx, ctx.outputs?.resolve('exportedPFrame')?.getPColumns());
+   // return ctx.createPFrame(ctx.outputs?.resolve('exportedPFrame')?.getPColumns()??[])
   })
   .output('table', (ctx) => {
     const cols = ctx.outputs?.resolve('exportedPFrame')?.getPColumns();

@@ -6,7 +6,7 @@ import { useApp } from '../app';
 import type { GraphMakerProps } from '@milaboratories/graph-maker';
 import { GraphMaker } from '@milaboratories/graph-maker';
 import type { PlSelectionModel } from '@platforma-sdk/model';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
 const app = useApp();
 
@@ -32,13 +32,18 @@ const selection = ref<PlSelectionModel>({
   selectedKeys: [],
 });
 
+// todo: add as debug feature to readme
+watch(() => app.model.outputs.graphPFrame, async (handle) => {
+  const list = await platforma?.pFrameDriver.listColumns(handle!);
+  console.log(list, 'list')
+}, {immediate: true})
 </script>
 
 <template>
   <PlBlockPage>
     <GraphMaker
       v-model="app.model.ui.graphState"
-      chartType="discrete"
+      chartType="scatterplot"
       :p-frame="app.model.outputs.graphPFrame"
     >
       <template #settingsSlot>

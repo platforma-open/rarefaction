@@ -62,7 +62,7 @@ wf.body(func(args) {
 	return {
 		outputs: {
 			debugStdoutStream: rarefactionCmd.getStdoutStream(),
-			rawPFrame: rawPFrame,
+			rawPFrame: exportedPFrame,//todo: remove unexported frame
 			exportedPFrame: exportedPFrame
 		},
 
