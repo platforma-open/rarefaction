@@ -12,31 +12,40 @@ const app = useApp();
 
 const defaultOptions: GraphMakerProps['defaultOptions'] = [
   {
-    inputName: 'x',
+    inputName: 'y',
     selectedSource: {
+      kind: 'PColumn',
       name: 'pl7.app/mean_unique_clonotypes',   //todo: fix spec
-      type: 'Float',
+      valueType: 'Float',
+      axesSpec: []
     }
   },
   {
-    inputName: 'y',
+    inputName: 'x',
     selectedSource: {
       name: 'pl7.app/subsampling_depth',
       type: 'Int',
     }
   },
+  {
+    inputName: 'grouping',
+    selectedSource: {
+      name: 'pl7.app/sampleId',
+      type: 'String',
+    }
+  }
 ];
 
 const selection = ref<PlSelectionModel>({
   axesSpec: [],
-  selectedKeys: [],
+  selectedKeys: []
 });
 
 // todo: add as debug feature to readme
 watch(() => app.model.outputs.graphPFrame, async (handle) => {
   const list = await platforma?.pFrameDriver.listColumns(handle!);
-  console.log(list, 'list')
-}, {immediate: true})
+  console.log(list, 'list');
+}, { immediate: true });
 </script>
 
 <template>
@@ -45,6 +54,8 @@ watch(() => app.model.outputs.graphPFrame, async (handle) => {
       v-model="app.model.ui.graphState"
       chartType="scatterplot"
       :p-frame="app.model.outputs.graphPFrame"
+      :default-options="defaultOptions"
+
     >
       <template #settingsSlot>
         <PlDropdownRef
