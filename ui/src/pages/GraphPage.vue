@@ -14,14 +14,14 @@ const defaultOptions: PredefinedGraphOption<'scatterplot'>[] = [
     selectedSource: {
       kind: 'PColumn',
       name: 'pl7.app/vdj/rarefaction/meanUniqueClonotypes',
-      valueType: 'Float',
+      valueType: 'Double',
       axesSpec: [],
     },
   },
   {
     inputName: 'x',
     selectedSource: {
-      name: 'pl7.app/vdj/rarefaction/samplingDepth',
+      name: 'pl7.app/vdj/rarefaction/depth',
       type: 'Int',
     },
   },
@@ -41,6 +41,7 @@ const defaultOptions: PredefinedGraphOption<'scatterplot'>[] = [
     <GraphMaker
       v-model="app.model.ui.graphState"
       chartType="scatterplot"
+      :data-state-key="app.model.args.datasetRef"
       :p-frame="app.model.outputs.graphPFrame"
       :default-options="defaultOptions"
     >

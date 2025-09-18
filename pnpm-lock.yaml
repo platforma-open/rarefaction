@@ -83,18 +83,15 @@ importers:
 
   block:
     dependencies:
-      '@platforma-open/platforma-open.rarefaction.model':
+      '@platforma-open/milaboratories.rarefaction.model':
         specifier: workspace:*
         version: link:../model
-      '@platforma-open/platforma-open.rarefaction.ui':
+      '@platforma-open/milaboratories.rarefaction.ui':
         specifier: workspace:*
         version: link:../ui
-      '@platforma-open/platforma-open.rarefaction.workflow':
+      '@platforma-open/milaboratories.rarefaction.workflow':
         specifier: workspace:*
         version: link:../workflow
-      '@platforma-sdk/model':
-        specifier: 'catalog:'
-        version: 1.43.14
     devDependencies:
       '@platforma-sdk/block-tools':
         specifier: 'catalog:'
@@ -137,7 +134,7 @@ importers:
   test:
     dependencies:
       this-block:
-        specifier: workspace:@platforma-open/platforma-open.rarefaction@*
+        specifier: workspace:@platforma-open/milaboratories.rarefaction@*
         version: link:../block
     devDependencies:
       '@platforma-sdk/test':
@@ -155,7 +152,7 @@ importers:
       '@milaboratories/graph-maker':
         specifier: 'catalog:'
         version: 1.1.159(d3-dispatch@3.0.1)(d3-path@3.1.0)(d3-scale-chromatic@3.1.0)(sortablejs@1.15.6)(typescript@5.5.4)
-      '@platforma-open/platforma-open.rarefaction.model':
+      '@platforma-open/milaboratories.rarefaction.model':
         specifier: workspace:*
         version: link:../model
       '@platforma-sdk/model':

@@ -64,10 +64,10 @@ export const model = BlockModel.create()
    *        OUTPUTS        *
    *************************/
   .output('graphPFrame', (ctx) => {
-    return createPFrameForGraphs(ctx, ctx.outputs?.resolve('exportedPFrame')?.getPColumns());
+    return createPFrameForGraphs(ctx, ctx.outputs?.resolve('rarefactionPFrame')?.getPColumns());
   })
   .output('table', (ctx) => {
-    const cols = ctx.outputs?.resolve('exportedPFrame')?.getPColumns();
+    const cols = ctx.outputs?.resolve('rarefactionPFrame')?.getPColumns();
     if (cols === undefined) {
       return undefined;
     }

@@ -1,7 +1,7 @@
-import { model } from '@platforma-open/platforma-open.rarefaction.model';
+import { model } from '@platforma-open/milaboratories.rarefaction.model';
 import { defineApp } from '@platforma-sdk/ui-vue';
-import TablePage from './pages/TablePage.vue';
 import GraphPage from './pages/GraphPage.vue';
+import TablePage from './pages/TablePage.vue';
 
 export const sdkPlugin = defineApp(model, () => {
   return {

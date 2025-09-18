@@ -1,5 +1,5 @@
 {
-  "name": "@platforma-open/platforma-open.rarefaction",
+  "name": "@platforma-open/milaboratories.rarefaction",
   "version": "1.0.0",
   "scripts": {
     "pretty": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json,vue}\"",
@@ -13,26 +13,29 @@
     "index.js"
   ],
   "dependencies": {
-    "@platforma-sdk/model": "catalog:",
-    "@platforma-open/platforma-open.rarefaction.workflow": "workspace:*",
-    "@platforma-open/platforma-open.rarefaction.model": "workspace:*",
-    "@platforma-open/platforma-open.rarefaction.ui": "workspace:*"
+    "@platforma-open/milaboratories.rarefaction.workflow": "workspace:*",
+    "@platforma-open/milaboratories.rarefaction.model": "workspace:*",
+    "@platforma-open/milaboratories.rarefaction.ui": "workspace:*"
   },
   "block": {
     "components": {
-      "workflow": "@platforma-open/platforma-open.rarefaction.workflow/dist/tengo/tpl/main.plj.gz",
-      "model": "@platforma-open/platforma-open.rarefaction.model/dist/model.json",
-      "ui": "@platforma-open/platforma-open.rarefaction.ui/dist"
+      "workflow": "@platforma-open/milaboratories.rarefaction.workflow/dist/tengo/tpl/main.plj.gz",
+      "model": "@platforma-open/milaboratories.rarefaction.model/dist/model.json",
+      "ui": "@platforma-open/milaboratories.rarefaction.ui/dist"
     },
     "meta": {
-      "title": "Rarefaction",
+      "title": "Repertoire rarefaction analysis",
       "logo": "file:../logos/block-logo.png",
-      "url": "https://github.com/platforma-open/platforma-open.rarefaction",
+      "url": "https://github.com/platforma-open/rarefaction",
       "support": "mailto:support@milaboratories.com",
-      "description": "Simple Hello World block that can be used as a boilerplate for newly created blocks.",
+      "description": "Performs rarefaction analysis on clonotype data to assess species richness.",
       "longDescription": "file:../docs/description.md",
       "changelog": "file:../CHANGELOG.md",
-      "tags": ["tutorial"],
+      "tags": [
+        "airr",
+        "downstream",
+        "repertoire"
+      ],
       "organization": {
         "name": "MiLaboratories Inc",
         "url": "https://milaboratories.com/",
