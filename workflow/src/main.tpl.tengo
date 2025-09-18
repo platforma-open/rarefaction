@@ -36,7 +36,7 @@ wf.body(func(args) {
     outfile := "rarefaction-output.tsv"
     numPoints := "--num-points=" + args.numPoints
     numIterations := "--num-iterations=" + args.numIterations
-    cacheMins := 15
+    cacheMins := 24*60
 
 	datasetSpec := args.columns.getSpec(args.datasetRef)
     tsvBuilder := pframes.tsvFileBuilder()
@@ -52,6 +52,7 @@ wf.body(func(args) {
         arg(numPoints).          // NUM_POINTS
         arg(numIterations).      // NUM_ITERATIONS
         saveFile(outfile).
+		dontSaveStdoutOrStderr().
         cacheMinutes(cacheMins).
         printErrStreamToStdout().
 		run()
@@ -61,7 +62,6 @@ wf.body(func(args) {
     exportedPFrame := pframes.exportFrame(rawPFrame)
 	return {
 		outputs: {
-			debugStdoutStream: rarefactionCmd.getStdoutStream(),
 			rawPFrame: exportedPFrame,//todo: remove unexported frame
 			exportedPFrame: exportedPFrame
 		},

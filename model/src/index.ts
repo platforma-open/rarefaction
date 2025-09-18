@@ -1,6 +1,6 @@
 import type { GraphMakerState } from '@milaboratories/graph-maker';
-import type { InferOutputsType, PlDataTableState, PlRef } from '@platforma-sdk/model';
-import { BlockModel, createPFrameForGraphs, createPlDataTableV2 } from '@platforma-sdk/model';
+import type { InferOutputsType, PlDataTableStateV2, PlRef } from '@platforma-sdk/model';
+import { BlockModel, createPFrameForGraphs, createPlDataTableStateV2, createPlDataTableV2 } from '@platforma-sdk/model';
 
 // validation rules
 function numRule(num: string | undefined): boolean {
@@ -24,7 +24,7 @@ export type BlockArgs = {
 
 export type UiState = {
   title?: string;
-  tableState: PlDataTableState;
+  tableState: PlDataTableStateV2;
   graphState: GraphMakerState;
 };
 
@@ -46,17 +46,11 @@ export const model = BlockModel.create()
    *        UI STATE       *
    *************************/
   .withUiState<UiState>({
-    tableState: {
-      gridState: {},
-    },
+    tableState: createPlDataTableStateV2(),
     graphState: {
       title: 'Rarefaction',
-      template: 'line_binnedDots',
-      // layersSettings: {
-      //   dots: {
-      //     dotFill: '#5d32c6',
-      //   },
-      // },
+      template: 'curve_dots',
+      currentTab: 'settings',
     },
   },
   )
@@ -71,7 +65,6 @@ export const model = BlockModel.create()
    *************************/
   .output('graphPFrame', (ctx) => {
     return createPFrameForGraphs(ctx, ctx.outputs?.resolve('exportedPFrame')?.getPColumns());
-   // return ctx.createPFrame(ctx.outputs?.resolve('exportedPFrame')?.getPColumns()??[])
   })
   .output('table', (ctx) => {
     const cols = ctx.outputs?.resolve('exportedPFrame')?.getPColumns();
@@ -82,12 +75,7 @@ export const model = BlockModel.create()
     return createPlDataTableV2(
       ctx,
       cols,
-      // if there are links, we need to pick one of the links to show all axes in the table
-      (spec) => {
-        return spec.name === "pl7.app/mean_unique_clonotypes";
-      },
       ctx.uiState.tableState,
-      undefined,
     );
   })
 
@@ -107,16 +95,13 @@ export const model = BlockModel.create()
       annotations: { 'pl7.app/isAnchor': 'true' },
     }]),
   )
-  .output('debugStdoutStream', (ctx) =>
-    ctx.outputs?.resolve('debugStdoutStream')?.getLogHandle(),
-  )
 
   /*************************
    *        SECTIONS       *
    *************************/
   .sections((_ctx) => [
     { type: 'link', href: '/', label: 'Graph' },
-    { type: 'link', href: '/table', label: 'Table' }
+    { type: 'link', href: '/table', label: 'Table' },
   ])
   .done();
 

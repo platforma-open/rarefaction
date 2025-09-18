@@ -12,11 +12,11 @@ getColumns := func(datasetSpec) {
       {
         column: "subsampling_depth",
         spec: {
-          name: "pl7.app/subsampling_depth",
+          name: "pl7.app/vdj/rarefaction/samplingDepth",
           type: "Int",
           domain: {},
           annotations: {
-            "pl7.app/label": "Subsampling Depth",
+            "pl7.app/label": "Sampling Depth",
             "pl7.app/table/visibility": "default"
           }
         }
@@ -27,7 +27,7 @@ getColumns := func(datasetSpec) {
         column: "mean_unique_clonotypes",
         id: "mean_unique_clonotypes",
         spec: {
-          name: "pl7.app/mean_unique_clonotypes",
+          name: "pl7.app/vdj/rarefaction/meanUniqueClonotypes",
           valueType: "Float",
           domain: {},
           annotations: {
