@@ -1,83 +1,106 @@
 import sys
 import polars as pl
 import numpy as np
-import json
-import math
+from math import lgamma, exp
 from typing import List, Dict, Tuple
 
 
-def get_rarefaction_depths(total_abundance: int, num_points_requested: int) -> List[int]:
+def get_rarefaction_depths(total_abundance: int, max_abundance: int, num_points_requested: int) -> List[int]:
     """
-    Generates a list of subsampling depths for rarefaction.
+    Generates a list of subsampling depths for rarefaction and extrapolation.
     """
     if total_abundance == 0:
         return [0]
-    if total_abundance == 1:
-        return [1]
-
-    if num_points_requested <= 0:
-        num_points_requested = 1
-    if num_points_requested == 1:
-        return [total_abundance]
-    if num_points_requested == 2:
-        return sorted(list({1, total_abundance}))
 
     depths = {1, total_abundance}
-    num_intermediate_points = num_points_requested - 2
 
-    if num_intermediate_points > 0:
-        # Logarithmic spacing
+    # Interpolation points (log-spaced up to total_abundance)
+    # Scale number of points based on sample size relative to max
+    inter_ratio = total_abundance / max_abundance
+    num_inter_points = max(0, int(num_points_requested * inter_ratio) - 2)
+
+    if total_abundance > 1 and num_inter_points > 0:
         log_min = np.log10(2)
         log_max = np.log10(total_abundance)
         if log_max > log_min:
-            log_spaced = np.logspace(
-                log_min, log_max, num=num_intermediate_points)
+            log_spaced = np.logspace(log_min, log_max, num=num_inter_points)
             for d in log_spaced:
                 depth = int(round(d))
                 if 1 < depth < total_abundance:
                     depths.add(depth)
 
-    # Ensure we have enough points, falling back to linear if needed
-    if len(depths) < num_points_requested:
-        additional_points_needed = num_points_requested - len(depths)
-        linear_spaced = np.linspace(
-            1, total_abundance, num=additional_points_needed + 2)
-        for d in linear_spaced:
+    # Extrapolation points (linearly spaced from total_abundance to max_abundance)
+    num_extra_points = num_points_requested - len(depths)
+    if num_extra_points > 0 and max_abundance > total_abundance:
+        extra_depths = np.linspace(
+            total_abundance, max_abundance, num=num_extra_points)
+        for d in extra_depths:
             depth = int(round(d))
-            if 1 < depth < total_abundance:
+            if depth > total_abundance:
                 depths.add(depth)
-                if len(depths) >= num_points_requested:
-                    break
 
     return sorted(list(depths))
 
 
-def rarefy(
-    counts: np.ndarray,
-    depth: int,
-) -> int:
+def rarefy(counts: np.ndarray, depth: int) -> float:
     """
-    Perform a single rarefaction to a given depth.
+    Perform analytical rarefaction (interpolation) using the combinatorial formula.
     """
-    if depth == 0:
-        return 0
+    total_abundance = int(counts.sum())
+    s_obs = len(counts)
 
-    total_abundance = counts.sum()
     if depth >= total_abundance:
-        return len(counts)
+        return float(s_obs)
+    if depth == 0:
+        return 0.0
 
-    # Chao's formula for rarefaction
-    n = total_abundance
-    n_k = counts
-    term = np.log(1.0 - depth / n)
-    s_obs = len(n_k)
-    f_k = np.bincount(n_k)[1:]
+    sum_p_miss = 0.0
+    for ni in counts:
+        if depth > total_abundance - ni:
+            p_miss = 0.0
+        else:
+            log_p_miss = (
+                lgamma(total_abundance - ni + 1) - lgamma(total_abundance - ni - depth + 1) -
+                lgamma(total_abundance + 1) +
+                lgamma(total_abundance - depth + 1)
+            )
+            p_miss = exp(log_p_miss)
+        sum_p_miss += p_miss
 
-    s_est = s_obs
-    for k in range(1, len(f_k) + 1):
-        s_est -= f_k[k-1] * (1 - depth/n)**k
+    return s_obs - sum_p_miss
 
-    return s_est
+
+def extrapolate(counts: np.ndarray, depth: int) -> float:
+    """
+    Perform analytical extrapolation to a given depth using the Chao1 formula.
+    """
+    total_abundance = int(counts.sum())
+    s_obs = len(counts)
+    f1 = np.sum(counts == 1)
+    f2 = np.sum(counts == 2)
+
+    if depth <= total_abundance:
+        return float(s_obs)
+
+    # Chao1 estimator for number of unseen species
+    f0_hat = 0
+    if f2 > 0:
+        f0_hat = ((total_abundance - 1) / total_abundance) * (f1**2) / (2 * f2)
+    else:
+        # bias-corrected version for f2=0
+        f0_hat = ((total_abundance - 1) / total_abundance) * \
+            (f1 * (f1 - 1)) / 2
+
+    t = depth - total_abundance
+
+    # Chao et al. 2014 extrapolation formula
+    if f1 > 0 and f0_hat > 0:
+        s_extrapolated = s_obs + f0_hat * \
+            (1 - (1 - f1 / (total_abundance * f0_hat + f1))**t)
+        return s_extrapolated
+    else:
+        # Cannot extrapolate without singletons, return observed richness
+        return float(s_obs)
 
 
 def run_rarefaction(
@@ -87,7 +110,7 @@ def run_rarefaction(
     num_iterations: int
 ):
     """
-    Performs rarefaction analysis on clonotype data from a TSV file.
+    Performs rarefaction and extrapolation analysis on clonotype data from a TSV file.
     """
     try:
         df = pl.read_csv(input_tsv_filepath, separator='\t')
@@ -99,14 +122,21 @@ def run_rarefaction(
         print(f"Error reading input file: {e}", file=sys.stderr)
         sys.exit(1)
 
-    results = []
-
-    for sample_id_val, sample_df in df.group_by("sample_id"):
+    # Pre-computation pass to find max abundance and store sample data
+    sample_data = {}
+    max_abundance = 0
+    grouped = df.group_by("sample_id")
+    for sample_id_val, sample_df in grouped:
         sample_id = sample_id_val[0] if isinstance(
             sample_id_val, tuple) else sample_id_val
         abundances = sample_df["abundance"].to_numpy()
-        total_abundance = abundances.sum()
+        total_abundance = int(abundances.sum())
+        sample_data[sample_id] = (abundances, total_abundance)
+        if total_abundance > max_abundance:
+            max_abundance = total_abundance
 
+    results = []
+    for sample_id, (abundances, total_abundance) in sample_data.items():
         if total_abundance == 0:
             results.append({
                 "pl7_app_sampleId": sample_id,
@@ -115,17 +145,14 @@ def run_rarefaction(
             })
             continue
 
-        depths = get_rarefaction_depths(total_abundance, num_points)
+        depths = get_rarefaction_depths(
+            total_abundance, max_abundance, num_points)
 
         for depth in depths:
-            richness_values = []
-            if num_iterations > 0:
-                # Analytical rarefaction does not require iterations,
-                # but we keep the loop structure in case a stochastic method is chosen later.
-                # For Chao's formula, one calculation is enough.
+            if depth <= total_abundance:
                 mean_richness = rarefy(abundances, depth)
             else:
-                mean_richness = 0.0
+                mean_richness = extrapolate(abundances, depth)
 
             results.append({
                 "pl7_app_sampleId": sample_id,
