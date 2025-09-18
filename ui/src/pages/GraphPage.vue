@@ -1,47 +1,53 @@
 <script setup lang="ts">
-import '@milaboratories/graph-maker/styles';
-import { PlBlockPage, PlDropdownRef, PlTextField } from '@platforma-sdk/ui-vue';
-import { useApp } from '../app';
-
 import type { PredefinedGraphOption } from '@milaboratories/graph-maker';
 import { GraphMaker } from '@milaboratories/graph-maker';
+import '@milaboratories/graph-maker/styles';
+import type { PColumnSpec } from '@platforma-sdk/model';
+import { PlBlockPage, PlDropdownRef, PlTextField } from '@platforma-sdk/ui-vue';
+import { computed } from 'vue';
+import { useApp } from '../app';
 
 const app = useApp();
 
-const defaultOptions: PredefinedGraphOption<'scatterplot'>[] = [
-  {
-    inputName: 'y',
-    selectedSource: {
-      kind: 'PColumn',
-      name: 'pl7.app/vdj/rarefaction/meanUniqueClonotypes',
-      valueType: 'Double',
-      axesSpec: [],
-    },
-  },
-  {
-    inputName: 'x',
-    selectedSource: {
-      name: 'pl7.app/vdj/rarefaction/depth',
-      type: 'Int',
-    },
-  },
-  {
-    inputName: 'grouping',
-    selectedSource: {
-      name: 'pl7.app/sampleId',
-      type: 'String',
-    },
-  },
-];
+const defaultOptions = computed((): PredefinedGraphOption<'scatterplot'>[] | undefined => {
+  const pCols = app.model.outputs.rarefactionPFrameCols;
+  if (!pCols) {
+    return undefined;
+  }
 
+  function getColumnSpec(name: string, cols: PColumnSpec[]) {
+    return cols.find((p) => p.name === name);
+  }
+
+  const yCol = getColumnSpec('pl7.app/vdj/rarefaction/meanUniqueClonotypes', pCols);
+
+  if (!yCol) {
+    return undefined;
+  }
+
+  return [
+    {
+      inputName: 'x',
+      selectedSource: yCol.axesSpec[1],
+    },
+    {
+      inputName: 'y',
+      selectedSource: yCol,
+    },
+    {
+      inputName: 'grouping',
+      selectedSource: yCol.axesSpec[0],
+    },
+  ];
+});
 </script>
 
 <template>
-  <PlBlockPage>
+  <PlBlockPage no-body-gutters>
     <GraphMaker
+      v-if="app.model.outputs.graphPFrame"
       v-model="app.model.ui.graphState"
-      chartType="scatterplot"
-      :data-state-key="app.model.args.datasetRef"
+      chart-type="scatterplot"
       :p-frame="app.model.outputs.graphPFrame"
       :default-options="defaultOptions"
     >

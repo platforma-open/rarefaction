@@ -66,6 +66,9 @@ export const model = BlockModel.create()
   .output('graphPFrame', (ctx) => {
     return createPFrameForGraphs(ctx, ctx.outputs?.resolve('rarefactionPFrame')?.getPColumns());
   })
+  .output('rarefactionPFrameCols', (ctx) => {
+    return ctx.outputs?.resolve('rarefactionPFrame')?.getPColumns()?.map((p) => p.spec);
+  })
   .output('table', (ctx) => {
     const cols = ctx.outputs?.resolve('rarefactionPFrame')?.getPColumns();
     if (cols === undefined) {
@@ -100,7 +103,7 @@ export const model = BlockModel.create()
    *        SECTIONS       *
    *************************/
   .sections((_ctx) => [
-    { type: 'link', href: '/', label: 'Graph' },
+    { type: 'link', href: '/', label: 'Curves' },
     { type: 'link', href: '/table', label: 'Table' },
   ])
   .done();

@@ -23,3 +23,4 @@ This block performs rarefaction analysis on immune repertoire sequencing data. I
 To build the block from the source code, run the following command in the block's root directory:
 
 `pnpm build:dev`
+

@@ -24,7 +24,7 @@
       "ui": "@platforma-open/milaboratories.rarefaction.ui/dist"
     },
     "meta": {
-      "title": "Repertoire rarefaction analysis",
+      "title": "Rarefaction analysis",
       "logo": "file:../logos/block-logo.png",
       "url": "https://github.com/platforma-open/rarefaction",
       "support": "mailto:support@milaboratories.com",
