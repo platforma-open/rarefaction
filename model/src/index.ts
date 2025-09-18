@@ -48,7 +48,7 @@ export const model = BlockModel.create()
   .withUiState<UiState>({
     tableState: createPlDataTableStateV2(),
     graphState: {
-      title: 'Rarefaction',
+      title: 'Rarefaction Curves',
       template: 'curve_dots',
       currentTab: 'settings',
     },
@@ -98,6 +98,7 @@ export const model = BlockModel.create()
       annotations: { 'pl7.app/isAnchor': 'true' },
     }]),
   )
+  .title((ctx) => ctx.uiState.title ?? 'Rarefaction')
 
   /*************************
    *        SECTIONS       *
