@@ -1,61 +1,55 @@
 <script setup lang="ts">
-import '@milaboratories/graph-maker/styles';
-import { PlBlockPage, PlDropdownRef, PlTextField } from '@platforma-sdk/ui-vue';
-import { useApp } from '../app';
-
-import type { GraphMakerProps } from '@milaboratories/graph-maker';
+import type { PredefinedGraphOption } from '@milaboratories/graph-maker';
 import { GraphMaker } from '@milaboratories/graph-maker';
-import type { PlSelectionModel } from '@platforma-sdk/model';
-import { ref, watch } from 'vue';
+import '@milaboratories/graph-maker/styles';
+import type { PColumnSpec } from '@platforma-sdk/model';
+import { PlBlockPage, PlDropdownRef, PlTextField } from '@platforma-sdk/ui-vue';
+import { computed } from 'vue';
+import { useApp } from '../app';
 
 const app = useApp();
 
-const defaultOptions: GraphMakerProps['defaultOptions'] = [
-  {
-    inputName: 'y',
-    selectedSource: {
-      kind: 'PColumn',
-      name: 'pl7.app/mean_unique_clonotypes',   //todo: fix spec
-      valueType: 'Float',
-      axesSpec: []
-    }
-  },
-  {
-    inputName: 'x',
-    selectedSource: {
-      name: 'pl7.app/subsampling_depth',
-      type: 'Int',
-    }
-  },
-  {
-    inputName: 'grouping',
-    selectedSource: {
-      name: 'pl7.app/sampleId',
-      type: 'String',
-    }
+const defaultOptions = computed((): PredefinedGraphOption<'scatterplot'>[] | undefined => {
+  const pCols = app.model.outputs.rarefactionPFrameCols;
+  if (!pCols) {
+    return undefined;
   }
-];
 
-const selection = ref<PlSelectionModel>({
-  axesSpec: [],
-  selectedKeys: []
+  function getColumnSpec(name: string, cols: PColumnSpec[]) {
+    return cols.find((p) => p.name === name);
+  }
+
+  const yCol = getColumnSpec('pl7.app/vdj/rarefaction/meanUniqueClonotypes', pCols);
+
+  if (!yCol) {
+    return undefined;
+  }
+
+  return [
+    {
+      inputName: 'x',
+      selectedSource: yCol.axesSpec[1],
+    },
+    {
+      inputName: 'y',
+      selectedSource: yCol,
+    },
+    {
+      inputName: 'grouping',
+      selectedSource: yCol.axesSpec[0],
+    },
+  ];
 });
-
-// todo: add as debug feature to readme
-watch(() => app.model.outputs.graphPFrame, async (handle) => {
-  const list = await platforma?.pFrameDriver.listColumns(handle!);
-  console.log(list, 'list');
-}, { immediate: true });
 </script>
 
 <template>
-  <PlBlockPage>
+  <PlBlockPage no-body-gutters>
     <GraphMaker
+      v-if="app.model.outputs.graphPFrame"
       v-model="app.model.ui.graphState"
-      chartType="scatterplot"
+      chart-type="scatterplot"
       :p-frame="app.model.outputs.graphPFrame"
       :default-options="defaultOptions"
-
     >
       <template #settingsSlot>
         <PlDropdownRef
@@ -66,11 +60,11 @@ watch(() => app.model.outputs.graphPFrame, async (handle) => {
         <PlTextField
           v-model="app.model.args.numPoints"
           label="Input points number"
-        /><!--todo: how to show validation error?-->
+        />
         <PlTextField
           v-model="app.model.args.numIterations"
           label="Number of iterations per depth"
-        /><!--todo: how to show validation error?-->
+        />
       </template>
     </GraphMaker>
   </PlBlockPage>

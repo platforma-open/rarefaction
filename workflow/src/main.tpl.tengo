@@ -4,11 +4,58 @@ assets := import("@platforma-sdk/workflow-tengo:assets")
 ll := import("@platforma-sdk/workflow-tengo:ll")
 pframes := import("@platforma-sdk/workflow-tengo:pframes")
 xsv := import("@platforma-sdk/workflow-tengo:pframes.xsv")
-file := import("@platforma-sdk/workflow-tengo:file")
-abundanceColsConv := import(":abundance-cols-conv")
+pSpec := import("@platforma-sdk/workflow-tengo:pframes.spec")
+maps := import("@platforma-sdk/workflow-tengo:maps")
 
+rarefactionSw := assets.importSoftware("@platforma-open/milaboratories.rarefaction.software:main")
 
-
+getSpec := func(abundanceSpec, args) {
+	return {
+		axes: [
+			{
+				column: "pl7_app_sampleId",
+				spec: abundanceSpec.axesSpec[0]
+			},
+			{
+				column: "subsampling_depth",
+				spec: {
+					name: "pl7.app/vdj/rarefaction/depth",
+					type: "Int",
+					domain: maps.merge(
+						abundanceSpec.domain,
+						{
+							"pl7.app/vdj/rarefaction/numPoints": args.numPoints,
+							"pl7.app/vdj/rarefaction/numIterations": args.numIterations
+						}
+					),
+					annotations: {
+						"pl7.app/label": "Rarefaction depth"
+					}
+				}
+			}
+		],
+		columns: [
+			{
+				column: "mean_unique_clonotypes",
+				spec: {
+					name: "pl7.app/vdj/rarefaction/meanUniqueClonotypes",
+					valueType: "Double",
+					domain: maps.merge(
+						abundanceSpec.domain,
+						{
+							"pl7.app/vdj/rarefaction/numPoints": args.numPoints,
+							"pl7.app/vdj/rarefaction/numIterations": args.numIterations
+						}
+					),
+					annotations: {
+						"pl7.app/label": "Mean unique clonotypes",
+						"pl7.app/format": ".2f"
+					}
+				}
+			}
+		]
+	}
+}
 
 wf.prepare(func(args) {
 	bundleBuilder := wf.createPBundleBuilder()
@@ -34,9 +81,6 @@ wf.prepare(func(args) {
 wf.body(func(args) {
     infile := "rarefaction-input.tsv"
     outfile := "rarefaction-output.tsv"
-    numPoints := "--num-points=" + args.numPoints
-    numIterations := "--num-iterations=" + args.numIterations
-    cacheMins := 15
 
 	datasetSpec := args.columns.getSpec(args.datasetRef)
     tsvBuilder := pframes.tsvFileBuilder()
@@ -45,29 +89,44 @@ wf.body(func(args) {
     tsv := tsvBuilder.build()
 
 	rarefactionCmd := exec.builder().
-		software(assets.importSoftware("@platforma-open/milaboratories.rarefaction.software:main")).
-		arg(infile).             // INPUT_TSV_FILEPATH
-        addFile(infile, tsv).    // INPUT_TSV_FILEPATH
-		arg(outfile).            // OUTPUT_TSV_FILEPATH
-        arg(numPoints).          // NUM_POINTS
-        arg(numIterations).      // NUM_ITERATIONS
+		software(rarefactionSw).
+		arg(infile).
+        addFile(infile, tsv).
+		arg(outfile).
+        arg(args.numPoints).
+        arg(args.numIterations).
         saveFile(outfile).
-        cacheMinutes(cacheMins).
+		dontSaveStdoutOrStderr().
+        cacheMinutes(24*60).
         printErrStreamToStdout().
 		run()
 
-    // { axes: ["pl7_app_sampleId":string, "subsampling_depth":int], columns: ["mean_unique_clonotypes":float]}
-    rawPFrame := xsv.importFile(rarefactionCmd.getFile(outfile), "tsv", abundanceColsConv.getColumns(datasetSpec))
-    exportedPFrame := pframes.exportFrame(rawPFrame)
+    rarefactionPFrame := xsv.importFile(rarefactionCmd.getFile(outfile), "tsv", getSpec(datasetSpec, args), {
+		splitDataAndSpec: true
+	})
+    
+    trace := pSpec.makeTrace(
+        datasetSpec,
+        {
+            type: "milaboratories.rarefaction",
+            id: wf.blockId().getDataAsJson(),
+            importance: 50,
+            label: "Rarefaction"
+        }
+    )
+
+    tracedPFrame := pframes.pFrameBuilder()
+    for colId, col in rarefactionPFrame {
+        tracedPFrame.add(colId, trace.inject(col.spec), col.data)
+    }
+	tracedPFrame = tracedPFrame.build()
+
 	return {
 		outputs: {
-			debugStdoutStream: rarefactionCmd.getStdoutStream(),
-			rawPFrame: exportedPFrame,//todo: remove unexported frame
-			exportedPFrame: exportedPFrame
+			rarefactionPFrame: pframes.exportFrame(tracedPFrame)
 		},
-
 		exports: {
-//			rarefactionPframe: rarefactionPframe todo:fix with spec example
+			rarefactionPFrame: tracedPFrame
 		}
 	}
 })
