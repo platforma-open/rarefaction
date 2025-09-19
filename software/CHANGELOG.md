@@ -1,5 +1,11 @@
 # @platforma-open/milaboratories.rarefaction.software
 
+## 1.2.0
+
+### Minor Changes
+
+- 56727cb: Added extrapolation viz
+
 ## 1.1.0
 
 ### Minor Changes

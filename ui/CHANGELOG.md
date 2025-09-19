@@ -1,5 +1,16 @@
 # @platforma-open/milaboratories.rarefaction.ui
 
+## 1.2.0
+
+### Minor Changes
+
+- 56727cb: Added extrapolation viz
+
+### Patch Changes
+
+- Updated dependencies [56727cb]
+  - @platforma-open/milaboratories.rarefaction.model@1.2.0
+
 ## 1.1.0
 
 ### Minor Changes
