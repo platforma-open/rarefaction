@@ -18,6 +18,9 @@ function numRuleError(num: string | undefined): boolean | string {
 export type BlockArgs = {
   numPoints: string;
   numIterations: string;
+  extrapolation: boolean;
+  mem?: number;
+  cpu?: number;
   datasetRef?: PlRef;
   numRules?: ((num: string) => boolean | string)[]; // todo find a way to show text field err
 };
@@ -40,6 +43,9 @@ export const model = BlockModel.create()
     numRules: [numRuleError],
     numPoints: '20',
     numIterations: '100',
+    extrapolation: true,
+    mem: 8,
+    cpu: 4,
   })
 
   /*************************
@@ -99,6 +105,8 @@ export const model = BlockModel.create()
     }]),
   )
   .title((ctx) => ctx.uiState.title ?? 'Rarefaction')
+
+  .output('isRunning', (ctx) => ctx.outputs?.getIsReadyOrError() === false)
 
   /*************************
    *        SECTIONS       *

@@ -52,6 +52,23 @@ getSpec := func(abundanceSpec, args) {
 						"pl7.app/format": ".2f"
 					}
 				}
+			},
+			{
+				column: "type",
+				spec: {
+					name: "pl7.app/vdj/rarefaction/type",
+					valueType: "String",
+					domain: maps.merge(
+						abundanceSpec.domain,
+						{
+							"pl7.app/vdj/rarefaction/numPoints": args.numPoints,
+							"pl7.app/vdj/rarefaction/numIterations": args.numIterations
+						}
+					),
+					annotations: {
+						"pl7.app/label": "Type"
+					}
+				}
 			}
 		]
 	}
@@ -90,11 +107,14 @@ wf.body(func(args) {
 
 	rarefactionCmd := exec.builder().
 		software(rarefactionSw).
+		mem(string(args.mem) + "GiB").
+		cpu(args.cpu).
 		arg(infile).
         addFile(infile, tsv).
 		arg(outfile).
         arg(args.numPoints).
         arg(args.numIterations).
+        arg(string(args.extrapolation)).
         saveFile(outfile).
 		dontSaveStdoutOrStderr().
         cacheMinutes(24*60).
