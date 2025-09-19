@@ -4,7 +4,7 @@ import { GraphMaker } from '@milaboratories/graph-maker';
 import '@milaboratories/graph-maker/styles';
 import type { PlRef } from '@platforma-sdk/model';
 import { plRefsEqual, type PColumnSpec } from '@platforma-sdk/model';
-import { PlBlockPage, PlDropdownRef, PlTextField } from '@platforma-sdk/ui-vue';
+import { PlAccordionSection, PlBlockPage, PlCheckbox, PlDropdownRef, PlNumberField, PlTextField } from '@platforma-sdk/ui-vue';
 import { computed } from 'vue';
 import { useApp } from '../app';
 
@@ -68,16 +68,63 @@ const defaultOptions = computed((): PredefinedGraphOption<'scatterplot'>[] | und
           label="Select dataset"
           :options="app.model.outputs.datasetOptions"
           clearable
+          :disabled="app.model.outputs.isRunning"
           @update:model-value="setDatasetRef"
-        />
+        >
+          <template #tooltip>
+            Select the dataset to be used for the rarefaction analysis.
+          </template>
+        </PlDropdownRef>
         <PlTextField
           v-model="app.model.args.numPoints"
           label="Input points number"
-        />
+          :disabled="app.model.outputs.isRunning"
+        >
+          <template #tooltip>
+            The number of subsampling depths to be used for the rarefaction analysis.
+          </template>
+        </PlTextField>
         <PlTextField
           v-model="app.model.args.numIterations"
           label="Number of iterations per depth"
-        />
+          :disabled="app.model.outputs.isRunning"
+        >
+          <template #tooltip>
+            The number of times the subsampling will be repeated at each depth.
+          </template>
+        </PlTextField>
+        <PlCheckbox
+          v-model="app.model.args.extrapolation"
+          label="Extrapolation"
+          :disabled="app.model.outputs.isRunning"
+        >
+          Extrapolate to largest sample
+          <template #tooltip>
+            Extrapolate the number of unique clonotypes for depths greater than the total number of clonotypes.
+          </template>
+        </PlCheckbox>
+        <PlAccordionSection label="Advanced Settings">
+          <PlNumberField
+            v-model="app.model.args.mem"
+            label="Memory (GiB)"
+            :disabled="app.model.outputs.isRunning"
+            :min-value="1"
+          >
+            <template #tooltip>
+              The amount of memory to allocate to the job.
+            </template>
+          </PlNumberField>
+          <PlNumberField
+            v-model="app.model.args.cpu"
+            label="CPU (cores)"
+            :disabled="app.model.outputs.isRunning"
+            :min-value="1"
+          >
+            <template #tooltip>
+              The number of CPU cores to allocate to the job.
+            </template>
+          </PlNumberField>
+        </PlAccordionSection>
       </template>
     </GraphMaker>
   </PlBlockPage>

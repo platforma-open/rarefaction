@@ -107,7 +107,8 @@ def run_rarefaction(
     input_tsv_filepath: str,
     output_tsv_filepath: str,
     num_points: int,
-    num_iterations: int
+    num_iterations: int,
+    extrapolation: bool
 ):
     """
     Performs rarefaction and extrapolation analysis on clonotype data from a TSV file.
@@ -152,7 +153,10 @@ def run_rarefaction(
             if depth <= total_abundance:
                 mean_richness = rarefy(abundances, depth)
             else:
-                mean_richness = extrapolate(abundances, depth)
+                if extrapolation:
+                    mean_richness = extrapolate(abundances, depth)
+                else:
+                    continue
 
             results.append({
                 "pl7_app_sampleId": sample_id,
@@ -171,8 +175,8 @@ def run_rarefaction(
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 5:
-        print("Usage: python main.py <input_tsv> <output_tsv> <num_points> <num_iterations>", file=sys.stderr)
+    if len(sys.argv) != 6:
+        print("Usage: python main.py <input_tsv> <output_tsv> <num_points> <num_iterations> <extrapolation>", file=sys.stderr)
         sys.exit(1)
 
     input_tsv = sys.argv[1]
@@ -180,8 +184,10 @@ if __name__ == '__main__':
     try:
         num_points = int(sys.argv[3])
         num_iterations = int(sys.argv[4])
+        extrapolation = sys.argv[5].lower() == 'true'
     except ValueError:
         print("Error: num_points and num_iterations must be integers.", file=sys.stderr)
         sys.exit(1)
 
-    run_rarefaction(input_tsv, output_tsv, num_points, num_iterations)
+    run_rarefaction(input_tsv, output_tsv, num_points,
+                    num_iterations, extrapolation)

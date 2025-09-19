@@ -90,11 +90,14 @@ wf.body(func(args) {
 
 	rarefactionCmd := exec.builder().
 		software(rarefactionSw).
+		mem(string(args.mem) + "GiB").
+		cpu(args.cpu).
 		arg(infile).
         addFile(infile, tsv).
 		arg(outfile).
         arg(args.numPoints).
         arg(args.numIterations).
+        arg(string(args.extrapolation)).
         saveFile(outfile).
 		dontSaveStdoutOrStderr().
         cacheMinutes(24*60).
