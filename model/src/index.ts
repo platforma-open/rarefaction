@@ -115,6 +115,6 @@ export const model = BlockModel.create()
     { type: 'link', href: '/', label: 'Curves' },
     { type: 'link', href: '/table', label: 'Table' },
   ])
-  .done();
+  .done(2);
 
 export type BlockOutputs = InferOutputsType<typeof model>;
