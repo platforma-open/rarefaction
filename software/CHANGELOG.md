@@ -1,5 +1,11 @@
 # @platforma-open/milaboratories.rarefaction.software
 
+## 1.2.1
+
+### Patch Changes
+
+- 8c2a02a: Full SDK update
+
 ## 1.2.0
 
 ### Minor Changes
