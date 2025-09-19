@@ -55,12 +55,16 @@ const defaultOptions = computed((): PredefinedGraphOption<'scatterplot'>[] | und
     },
   ];
 });
+
+const key = computed(() => defaultOptions.value ? JSON.stringify(defaultOptions.value) : '');
+
 </script>
 
 <template>
   <PlBlockPage no-body-gutters>
     <GraphMaker
       v-if="app.model.outputs.graphPFrame"
+      :key="key"
       v-model="app.model.ui.graphState"
       chart-type="scatterplot"
       :p-frame="app.model.outputs.graphPFrame"
