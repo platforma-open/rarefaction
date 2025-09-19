@@ -142,7 +142,8 @@ def run_rarefaction(
             results.append({
                 "pl7_app_sampleId": sample_id,
                 "subsampling_depth": 0,
-                "mean_unique_clonotypes": "0.00"
+                "mean_unique_clonotypes": "0.00",
+                "type": "Interpolation"
             })
             continue
 
@@ -152,16 +153,19 @@ def run_rarefaction(
         for depth in depths:
             if depth <= total_abundance:
                 mean_richness = rarefy(abundances, depth)
+                point_type = "Interpolation"
             else:
                 if extrapolation:
                     mean_richness = extrapolate(abundances, depth)
+                    point_type = "Extrapolation"
                 else:
                     continue
 
             results.append({
                 "pl7_app_sampleId": sample_id,
                 "subsampling_depth": depth,
-                "mean_unique_clonotypes": f"{mean_richness:.2f}"
+                "mean_unique_clonotypes": f"{mean_richness:.2f}",
+                "type": point_type
             })
 
     try:

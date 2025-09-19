@@ -52,6 +52,23 @@ getSpec := func(abundanceSpec, args) {
 						"pl7.app/format": ".2f"
 					}
 				}
+			},
+			{
+				column: "type",
+				spec: {
+					name: "pl7.app/vdj/rarefaction/type",
+					valueType: "String",
+					domain: maps.merge(
+						abundanceSpec.domain,
+						{
+							"pl7.app/vdj/rarefaction/numPoints": args.numPoints,
+							"pl7.app/vdj/rarefaction/numIterations": args.numIterations
+						}
+					),
+					annotations: {
+						"pl7.app/label": "Type"
+					}
+				}
 			}
 		]
 	}

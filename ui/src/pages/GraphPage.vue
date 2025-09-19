@@ -30,8 +30,9 @@ const defaultOptions = computed((): PredefinedGraphOption<'scatterplot'>[] | und
   }
 
   const yCol = getColumnSpec('pl7.app/vdj/rarefaction/meanUniqueClonotypes', pCols);
+  const shapeCol = getColumnSpec('pl7.app/vdj/rarefaction/type', pCols);
 
-  if (!yCol) {
+  if (!yCol || !shapeCol) {
     return undefined;
   }
 
@@ -47,6 +48,10 @@ const defaultOptions = computed((): PredefinedGraphOption<'scatterplot'>[] | und
     {
       inputName: 'grouping',
       selectedSource: yCol.axesSpec[0],
+    },
+    {
+      inputName: 'shape',
+      selectedSource: shapeCol,
     },
   ];
 });
