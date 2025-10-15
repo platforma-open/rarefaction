@@ -1,5 +1,21 @@
 # @platforma-open/milaboratories.rarefaction
 
+## 1.0.5
+
+### Patch Changes
+
+- a262b52: technical release
+- 391913b: technical release
+- 811e16f: technical release
+- eb49134: technical release
+- Updated dependencies [a262b52]
+- Updated dependencies [391913b]
+- Updated dependencies [811e16f]
+- Updated dependencies [eb49134]
+  - @platforma-open/milaboratories.rarefaction.model@1.2.2
+  - @platforma-open/milaboratories.rarefaction.ui@1.2.2
+  - @platforma-open/milaboratories.rarefaction.workflow@1.1.2
+
 ## 1.0.4
 
 ### Patch Changes
