@@ -1,5 +1,11 @@
 # @platforma-open/milaboratories.rarefaction.software
 
+## 1.2.3
+
+### Patch Changes
+
+- f1cf90d: Support parquet format (update SDK)
+
 ## 1.2.2
 
 ### Patch Changes
