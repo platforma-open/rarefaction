@@ -70,7 +70,9 @@ getSpec := func(abundanceSpec, args) {
 					}
 				}
 			}
-		]
+		],
+		storageFormat: "Parquet",
+		partitionKeyLength: 0
 	}
 }
 

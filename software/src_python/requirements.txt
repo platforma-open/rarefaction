@@ -1,2 +1,2 @@
-polars
-numpy
+polars-lts-cpu==1.33.0
+numpy==2.2.6
