@@ -1,5 +1,11 @@
 # @platforma-open/milaboratories.rarefaction.ui
 
+## 1.2.4
+
+### Patch Changes
+
+- 4750a61: update graph-maker version
+
 ## 1.2.3
 
 ### Patch Changes
