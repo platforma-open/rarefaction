@@ -1,5 +1,11 @@
 # @platforma-open/milaboratories.rarefaction
 
+## 1.0.9
+
+### Patch Changes
+
+- a247a45: Update SDK
+
 ## 1.0.8
 
 ### Patch Changes
