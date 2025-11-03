@@ -4,6 +4,20 @@ assets := import("@platforma-sdk/workflow-tengo:assets")
 
 rarefactionSw := assets.importSoftware("@platforma-open/milaboratories.rarefaction.software:main")
 
+self.validateInputs({
+    "__options__,closed": "",
+    infile: "any",
+    outfile: "any",
+    inputTsv: "any",
+    numPoints: "string",
+    numIterations: "string",
+    extrapolation: "boolean",
+    metaInputs: {
+        "__options__,closed": "",
+        "mem,?": "number",
+        "cpu,?": "number"
+    }
+})
 
 self.defineOutputs("rarefactionOutput")
 
@@ -30,7 +44,7 @@ self.body(func(args) {
             arg(string(extrapolation)).
             saveFile(outfile).
             dontSaveStdoutOrStderr().
-            cacheMinutes(24*60).
+            cacheMinutes(4*60).
             printErrStreamToStdout().
             run()
 
