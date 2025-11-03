@@ -6,8 +6,6 @@ rarefactionSw := assets.importSoftware("@platforma-open/milaboratories.rarefacti
 
 self.validateInputs({
     "__options__,closed": "",
-    infile: "any",
-    outfile: "any",
     inputTsv: "any",
     numPoints: "string",
     numIterations: "string",
@@ -28,9 +26,10 @@ self.body(func(args) {
     numPoints := args.numPoints
     numIterations := args.numIterations
     extrapolation := args.extrapolation
-    infile := args.infile
-    outfile := args.outfile
     inputTsv := args.inputTsv
+
+    infile := "rarefaction-input.tsv"
+    outfile := "rarefaction-output.tsv"
 
     rarefactionCmd := exec.builder().
             software(rarefactionSw).

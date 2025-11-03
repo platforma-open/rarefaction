@@ -108,8 +108,6 @@ wf.body(func(args) {
 	// Call UMAP calculation subtemplate
 	rarefactionRender := render.create(rarefactionTpl, {
 		inputTsv: tsv,
-		infile: "rarefaction-input.tsv",
-		outfile: "rarefaction-output.tsv",
 		numPoints: args.numPoints,
 		numIterations: args.numIterations,
 		extrapolation: args.extrapolation,
