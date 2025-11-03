@@ -1,13 +1,13 @@
 wf := import("@platforma-sdk/workflow-tengo:workflow")
-exec := import("@platforma-sdk/workflow-tengo:exec")
 assets := import("@platforma-sdk/workflow-tengo:assets")
 ll := import("@platforma-sdk/workflow-tengo:ll")
 pframes := import("@platforma-sdk/workflow-tengo:pframes")
 xsv := import("@platforma-sdk/workflow-tengo:pframes.xsv")
 pSpec := import("@platforma-sdk/workflow-tengo:pframes.spec")
 maps := import("@platforma-sdk/workflow-tengo:maps")
+render := import("@platforma-sdk/workflow-tengo:render")
 
-rarefactionSw := assets.importSoftware("@platforma-open/milaboratories.rarefaction.software:main")
+rarefactionTpl := assets.importTemplate(":rarefaction-calculation")
 
 getSpec := func(abundanceSpec, args) {
 	return {
@@ -98,8 +98,6 @@ wf.prepare(func(args) {
 })
 
 wf.body(func(args) {
-    infile := "rarefaction-input.tsv"
-    outfile := "rarefaction-output.tsv"
 
 	datasetSpec := args.columns.getSpec(args.datasetRef)
     tsvBuilder := pframes.tsvFileBuilder()
@@ -107,23 +105,21 @@ wf.body(func(args) {
     tsvBuilder.setAxisHeader(datasetSpec.axesSpec[1].name, "clonotypeKey")
     tsv := tsvBuilder.build()
 
-	rarefactionCmd := exec.builder().
-		software(rarefactionSw).
-		mem(string(args.mem) + "GiB").
-		cpu(args.cpu).
-		arg(infile).
-        addFile(infile, tsv).
-		arg(outfile).
-        arg(args.numPoints).
-        arg(args.numIterations).
-        arg(string(args.extrapolation)).
-        saveFile(outfile).
-		dontSaveStdoutOrStderr().
-        cacheMinutes(24*60).
-        printErrStreamToStdout().
-		run()
+	// Call UMAP calculation subtemplate
+	rarefactionRender := render.create(rarefactionTpl, {
+		inputTsv: tsv,
+		infile: "rarefaction-input.tsv",
+		outfile: "rarefaction-output.tsv",
+		numPoints: args.numPoints,
+		numIterations: args.numIterations,
+		extrapolation: args.extrapolation,
+		metaInputs: {
+			mem: args.mem,
+			cpu: args.cpu
+		}
+	})
 
-    rarefactionPFrame := xsv.importFile(rarefactionCmd.getFile(outfile), "tsv", getSpec(datasetSpec, args), {
+    rarefactionPFrame := xsv.importFile(rarefactionRender.output("rarefactionOutput"), "tsv", getSpec(datasetSpec, args), {
 		splitDataAndSpec: true
 	})
     
