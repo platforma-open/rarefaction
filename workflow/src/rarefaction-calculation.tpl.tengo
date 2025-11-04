@@ -42,7 +42,6 @@ self.body(func(args) {
             arg(numIterations).
             arg(string(extrapolation)).
             saveFile(outfile).
-            dontSaveStdoutOrStderr().
             cacheMinutes(4*60).
             printErrStreamToStdout().
             run()
