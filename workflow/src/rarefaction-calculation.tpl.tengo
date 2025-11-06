@@ -1,0 +1,52 @@
+self := import("@platforma-sdk/workflow-tengo:tpl")
+exec := import("@platforma-sdk/workflow-tengo:exec")
+assets := import("@platforma-sdk/workflow-tengo:assets")
+
+rarefactionSw := assets.importSoftware("@platforma-open/milaboratories.rarefaction.software:main")
+
+self.validateInputs({
+    "__options__,closed": "",
+    inputTsv: "any",
+    numPoints: "string",
+    numIterations: "string",
+    extrapolation: "boolean",
+    metaInputs: {
+        "__options__,closed": "",
+        "mem,?": "number",
+        "cpu,?": "number"
+    }
+})
+
+self.defineOutputs("rarefactionOutput")
+
+self.body(func(args) {
+    // Get input parameters
+    cpu := args.metaInputs.cpu
+    mem := args.metaInputs.mem
+    numPoints := args.numPoints
+    numIterations := args.numIterations
+    extrapolation := args.extrapolation
+    inputTsv := args.inputTsv
+
+    infile := "rarefaction-input.tsv"
+    outfile := "rarefaction-output.tsv"
+
+    rarefactionCmd := exec.builder().
+            software(rarefactionSw).
+            mem(string(mem) + "GiB").
+            cpu(cpu).
+            arg(infile).
+            addFile(infile, inputTsv).
+            arg(outfile).
+            arg(numPoints).
+            arg(numIterations).
+            arg(string(extrapolation)).
+            saveFile(outfile).
+            cacheMinutes(4*60).
+            printErrStreamToStdout().
+            run()
+
+    return {
+        rarefactionOutput: rarefactionCmd.getFile(outfile)
+    }
+})
