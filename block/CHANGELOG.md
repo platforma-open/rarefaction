@@ -1,5 +1,12 @@
 # @platforma-open/milaboratories.rarefaction
 
+## 1.0.10
+
+### Patch Changes
+
+- Updated dependencies [602e87e]
+  - @platforma-open/milaboratories.rarefaction.workflow@1.1.4
+
 ## 1.0.9
 
 ### Patch Changes

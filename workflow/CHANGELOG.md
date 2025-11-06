@@ -1,5 +1,11 @@
 # @platforma-open/milaboratories.rarefaction.workflow
 
+## 1.1.4
+
+### Patch Changes
+
+- 602e87e: Fix deduplication
+
 ## 1.1.3
 
 ### Patch Changes
