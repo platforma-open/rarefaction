@@ -27,8 +27,9 @@
       "title": "Rarefaction analysis",
       "logo": "file:../logos/block-logo.png",
       "url": "https://github.com/platforma-open/rarefaction",
+      "docs": "https://docs.platforma.bio/guides/vdj-analysis/rarefaction/",
       "support": "mailto:support@milaboratories.com",
-      "description": "Performs rarefaction analysis on clonotype data to assess species richness.",
+      "description": "Performs rarefaction analysis on clonotype data to assess repertoire diversity and compare clonotype richness across samples with different sequencing depths.",
       "longDescription": "file:../docs/description.md",
       "changelog": "file:../CHANGELOG.md",
       "tags": [
