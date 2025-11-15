@@ -1,5 +1,11 @@
 # @platforma-open/milaboratories.rarefaction
 
+## 1.0.11
+
+### Patch Changes
+
+- c3d0cdb: Block metadata updated.
+
 ## 1.0.10
 
 ### Patch Changes
