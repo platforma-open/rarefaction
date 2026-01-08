@@ -5,7 +5,6 @@ import { useApp } from '../app';
 const app = useApp();
 
 const tableSettings = usePlDataTableSettingsV2({
-  sourceId: () => app.model.args.datasetRef,
   model: () => app.model.outputs.table,
 });
 
