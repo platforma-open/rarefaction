@@ -1,5 +1,13 @@
 # @platforma-open/milaboratories.rarefaction.ui
 
+## 1.2.5
+
+### Patch Changes
+
+- 8e56508: Show running state for tables and graphs
+- Updated dependencies [8e56508]
+  - @platforma-open/milaboratories.rarefaction.model@1.2.3
+
 ## 1.2.4
 
 ### Patch Changes

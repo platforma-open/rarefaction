@@ -1,5 +1,11 @@
 # @platforma-open/milaboratories.rarefaction.test
 
+## 1.0.3
+
+### Patch Changes
+
+- 8e56508: Show running state for tables and graphs
+
 ## 1.0.2
 
 ### Patch Changes
