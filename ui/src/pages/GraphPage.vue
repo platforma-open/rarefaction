@@ -21,10 +21,10 @@ watchEffect(() => {
     }
   }
 
-  // Build secondary parts (iterations and extrapolation)
+  // Build secondary parts (points and extrapolation)
   const secondaryParts: string[] = [];
-  if (app.model.args.numIterations) {
-    secondaryParts.push(`${app.model.args.numIterations} iterations`);
+  if (app.model.args.numPoints) {
+    secondaryParts.push(`${app.model.args.numPoints} points`);
   }
   if (app.model.args.extrapolation) {
     secondaryParts.push('extrapolated');
