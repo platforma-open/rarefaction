@@ -1,5 +1,11 @@
 # @platforma-open/milaboratories.rarefaction.model
 
+## 1.3.0
+
+### Minor Changes
+
+- f1908f9: Support custom block title and running status
+
 ## 1.2.3
 
 ### Patch Changes
