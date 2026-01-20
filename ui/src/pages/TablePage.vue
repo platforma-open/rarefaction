@@ -11,9 +11,9 @@ const tableSettings = usePlDataTableSettingsV2({
 </script>
 
 <template>
-  <PlBlockPage>
-    <template #title>Rarefaction</template>
-
+  <PlBlockPage
+    title="Rarefaction"
+  >
     <PlAgDataTableV2
       v-model="app.model.ui.tableState"
       :settings="tableSettings"

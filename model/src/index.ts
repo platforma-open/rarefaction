@@ -16,6 +16,8 @@ function numRuleError(num: string | undefined): boolean | string {
 }
 
 export type BlockArgs = {
+  defaultBlockLabel: string;
+  customBlockLabel: string;
   numPoints: string;
   numIterations: string;
   extrapolation: boolean;
@@ -26,7 +28,6 @@ export type BlockArgs = {
 };
 
 export type UiState = {
-  title?: string;
   tableState: PlDataTableStateV2;
   graphState: GraphMakerState;
 };
@@ -40,6 +41,8 @@ export const model = BlockModel.create()
    *          ARGS         *
    *************************/
   .withArgs<BlockArgs>({
+    defaultBlockLabel: 'Select dataset',
+    customBlockLabel: '',
     numRules: [numRuleError],
     numPoints: '20',
     numIterations: '100',
@@ -104,7 +107,9 @@ export const model = BlockModel.create()
       annotations: { 'pl7.app/isAnchor': 'true' },
     }]),
   )
-  .title((ctx) => ctx.uiState.title ?? 'Rarefaction')
+  .title(() => 'Rarefaction')
+
+  .subtitle((ctx) => ctx.args.customBlockLabel || ctx.args.defaultBlockLabel || '')
 
   .output('isRunning', (ctx) => ctx.outputs?.getIsReadyOrError() === false)
 
