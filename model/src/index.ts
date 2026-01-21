@@ -73,7 +73,11 @@ export const model = BlockModel.create()
    *        OUTPUTS        *
    *************************/
   .outputWithStatus('graphPFrame', (ctx) => {
-    return createPFrameForGraphs(ctx, ctx.outputs?.resolve('rarefactionPFrame')?.getPColumns());
+    const pCols = ctx.outputs?.resolve('rarefactionPFrame')?.getPColumns();
+    if (pCols === undefined) {
+      return undefined;
+    }
+    return createPFrameForGraphs(ctx, pCols);
   })
   .output('rarefactionPFrameCols', (ctx) => {
     return ctx.outputs?.resolve('rarefactionPFrame')?.getPColumns()?.map((p) => p.spec);

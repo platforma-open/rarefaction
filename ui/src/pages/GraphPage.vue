@@ -44,10 +44,10 @@ function setDatasetRef(datasetRef?: PlRef) {
   app.model.args.datasetRef = datasetRef;
 }
 
-const defaultOptions = computed((): PredefinedGraphOption<'scatterplot'>[] | undefined => {
+const defaultOptions = computed((): PredefinedGraphOption<'scatterplot'>[] | null => {
   const pCols = app.model.outputs.rarefactionPFrameCols;
   if (!pCols) {
-    return undefined;
+    return null;
   }
 
   function getColumnSpec(name: string, cols: PColumnSpec[]) {
@@ -58,7 +58,7 @@ const defaultOptions = computed((): PredefinedGraphOption<'scatterplot'>[] | und
   const shapeCol = getColumnSpec('pl7.app/vdj/rarefaction/type', pCols);
 
   if (!yCol || !shapeCol) {
-    return undefined;
+    return null;
   }
 
   return [
@@ -88,7 +88,6 @@ const key = computed(() => defaultOptions.value ? JSON.stringify(defaultOptions.
 <template>
   <PlBlockPage no-body-gutters>
     <GraphMaker
-      v-if="app.model.outputs.graphPFrame"
       :key="key"
       v-model="app.model.ui.graphState"
       chart-type="scatterplot"
