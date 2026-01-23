@@ -4,4 +4,4 @@
 "@platforma-open/milaboratories.rarefaction.ui": patch
 ---
 
-Fix initial block state, remove workflow exports
+Fix initial block state, remove workflow exports, improve block subtitle generation

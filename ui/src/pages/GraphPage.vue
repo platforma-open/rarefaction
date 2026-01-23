@@ -3,42 +3,12 @@ import type { PredefinedGraphOption } from '@milaboratories/graph-maker';
 import { GraphMaker } from '@milaboratories/graph-maker';
 import '@milaboratories/graph-maker/styles';
 import type { PlRef } from '@platforma-sdk/model';
-import { plRefsEqual, type PColumnSpec } from '@platforma-sdk/model';
+import { type PColumnSpec } from '@platforma-sdk/model';
 import { PlAccordionSection, PlBlockPage, PlCheckbox, PlDropdownRef, PlNumberField, PlTextField } from '@platforma-sdk/ui-vue';
-import { computed, watchEffect } from 'vue';
+import { computed } from 'vue';
 import { useApp } from '../app';
 
 const app = useApp();
-
-// updating defaultBlockLabel
-watchEffect(() => {
-  let label = '';
-  // Add dataset name if available
-  if (app.model.args.datasetRef) {
-    const datasetOption = app.model.outputs.datasetOptions?.find((o) => plRefsEqual(o.ref, app.model.args.datasetRef!));
-    if (datasetOption?.label) {
-      label = datasetOption.label;
-    }
-  }
-
-  // Build secondary parts (points and extrapolation)
-  const secondaryParts: string[] = [];
-  if (app.model.args.numPoints) {
-    secondaryParts.push(`${app.model.args.numPoints} points`);
-  }
-  if (app.model.args.extrapolation) {
-    secondaryParts.push('extrapolated');
-  }
-
-  // Combine: "Dataset - 10 iter, extrapolated"
-  if (label && secondaryParts.length > 0) {
-    label = `${label} - ${secondaryParts.join(', ')}`;
-  } else if (secondaryParts.length > 0) {
-    label = secondaryParts.join(', ');
-  }
-
-  app.model.args.defaultBlockLabel = label || 'Select dataset';
-});
 
 function setDatasetRef(datasetRef?: PlRef) {
   app.model.args.datasetRef = datasetRef;
