@@ -6,10 +6,22 @@ import strings from '@milaboratories/strings';
 import type { PlRef } from '@platforma-sdk/model';
 import { type PColumnSpec } from '@platforma-sdk/model';
 import { PlAccordionSection, PlBlockPage, PlCheckbox, PlDropdownRef, PlNumberField, PlTextField } from '@platforma-sdk/ui-vue';
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 import { useApp } from '../app';
 
 const app = useApp();
+
+// Auto-close settings panel when block starts running
+watch(
+  () => app.model.outputs.isRunning,
+  (isRunning, wasRunning) => {
+    // Close settings when block starts running (false -> true transition)
+    if (isRunning && !wasRunning) {
+      // Close the settings tab by setting currentTab to null
+      app.model.ui.graphState.currentTab = null;
+    }
+  },
+);
 
 function setDatasetRef(datasetRef?: PlRef) {
   app.model.args.datasetRef = datasetRef;

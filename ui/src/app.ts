@@ -10,13 +10,6 @@ export const sdkPlugin = defineApp(model, (app) => {
 
   syncDefaultBlockLabel(app.model);
 
-  // Close settings panel when block starts running
-  watchEffect(() => {
-    if (app.model.outputs.isRunning) {
-      app.model.ui.graphState.currentTab = null;
-    }
-  });
-
   return {
     routes: {
       '/': () => GraphPage,
