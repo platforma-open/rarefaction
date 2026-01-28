@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@milaboratories/graph-maker": "catalog:",
+    "@milaboratories/strings": "catalog:",
     "@platforma-open/milaboratories.rarefaction.model": "workspace:*",
     "@platforma-sdk/model": "catalog:",
     "@platforma-sdk/ui-vue": "catalog:",

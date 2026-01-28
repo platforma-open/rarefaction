@@ -2,6 +2,7 @@
 import type { PredefinedGraphOption } from '@milaboratories/graph-maker';
 import { GraphMaker } from '@milaboratories/graph-maker';
 import '@milaboratories/graph-maker/styles';
+import strings from '@milaboratories/strings';
 import type { PlRef } from '@platforma-sdk/model';
 import { type PColumnSpec } from '@platforma-sdk/model';
 import { PlAccordionSection, PlBlockPage, PlCheckbox, PlDropdownRef, PlNumberField, PlTextField } from '@platforma-sdk/ui-vue';
@@ -63,6 +64,7 @@ const key = computed(() => defaultOptions.value ? JSON.stringify(defaultOptions.
       chart-type="scatterplot"
       :p-frame="app.model.outputs.graphPFrame"
       :default-options="defaultOptions"
+      :status-text="{ noPframe: { title: strings.callToActions.configureSettingsAndRun } }"
     >
       <template #settingsSlot>
         <PlDropdownRef
@@ -105,7 +107,7 @@ const key = computed(() => defaultOptions.value ? JSON.stringify(defaultOptions.
             Extrapolate the number of unique clonotypes for depths greater than the total number of clonotypes.
           </template>
         </PlCheckbox>
-        <PlAccordionSection label="Advanced Settings">
+        <PlAccordionSection :label="strings.titles.advancedSettings">
           <PlNumberField
             v-model="app.model.args.mem"
             label="Memory (GiB)"
