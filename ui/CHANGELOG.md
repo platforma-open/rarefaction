@@ -1,5 +1,13 @@
 # @platforma-open/milaboratories.rarefaction.ui
 
+## 1.3.1
+
+### Patch Changes
+
+- 778acaf: Fix initial block state, remove workflow exports, improve block subtitle generation
+- Updated dependencies [778acaf]
+  - @platforma-open/milaboratories.rarefaction.model@1.3.1
+
 ## 1.3.0
 
 ### Minor Changes

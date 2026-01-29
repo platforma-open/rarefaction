@@ -1,5 +1,11 @@
 # @platforma-open/milaboratories.rarefaction.workflow
 
+## 1.1.6
+
+### Patch Changes
+
+- 778acaf: Fix initial block state, remove workflow exports, improve block subtitle generation
+
 ## 1.1.5
 
 ### Patch Changes
