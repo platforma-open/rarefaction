@@ -1,6 +1,7 @@
 import type { GraphMakerState } from '@milaboratories/graph-maker';
 import type { InferOutputsType, PlDataTableStateV2, PlRef } from '@platforma-sdk/model';
 import { BlockModel, createPFrameForGraphs, createPlDataTableStateV2, createPlDataTableV2 } from '@platforma-sdk/model';
+import { getDefaultBlockLabel } from './label';
 
 // validation rules
 function numRule(num: string | undefined): boolean {
@@ -41,7 +42,10 @@ export const model = BlockModel.create()
    *          ARGS         *
    *************************/
   .withArgs<BlockArgs>({
-    defaultBlockLabel: 'Select dataset',
+    defaultBlockLabel: getDefaultBlockLabel({
+      numPoints: '20',
+      extrapolation: true,
+    }),
     customBlockLabel: '',
     numRules: [numRuleError],
     numPoints: '20',
@@ -73,7 +77,11 @@ export const model = BlockModel.create()
    *        OUTPUTS        *
    *************************/
   .outputWithStatus('graphPFrame', (ctx) => {
-    return createPFrameForGraphs(ctx, ctx.outputs?.resolve('rarefactionPFrame')?.getPColumns());
+    const pCols = ctx.outputs?.resolve('rarefactionPFrame')?.getPColumns();
+    if (pCols === undefined) {
+      return undefined;
+    }
+    return createPFrameForGraphs(ctx, pCols);
   })
   .output('rarefactionPFrameCols', (ctx) => {
     return ctx.outputs?.resolve('rarefactionPFrame')?.getPColumns()?.map((p) => p.spec);
@@ -123,3 +131,5 @@ export const model = BlockModel.create()
   .done(2);
 
 export type BlockOutputs = InferOutputsType<typeof model>;
+
+export { getDefaultBlockLabel } from './label';

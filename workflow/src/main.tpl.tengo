@@ -141,8 +141,6 @@ wf.body(func(args) {
 		outputs: {
 			rarefactionPFrame: pframes.exportFrame(tracedPFrame)
 		},
-		exports: {
-			rarefactionPFrame: tracedPFrame
-		}
+		exports: {}
 	}
 })

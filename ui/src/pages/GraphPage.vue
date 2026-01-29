@@ -2,52 +2,35 @@
 import type { PredefinedGraphOption } from '@milaboratories/graph-maker';
 import { GraphMaker } from '@milaboratories/graph-maker';
 import '@milaboratories/graph-maker/styles';
+import strings from '@milaboratories/strings';
 import type { PlRef } from '@platforma-sdk/model';
-import { plRefsEqual, type PColumnSpec } from '@platforma-sdk/model';
+import { type PColumnSpec } from '@platforma-sdk/model';
 import { PlAccordionSection, PlBlockPage, PlCheckbox, PlDropdownRef, PlNumberField, PlTextField } from '@platforma-sdk/ui-vue';
-import { computed, watchEffect } from 'vue';
+import { computed, watch } from 'vue';
 import { useApp } from '../app';
 
 const app = useApp();
 
-// updating defaultBlockLabel
-watchEffect(() => {
-  let label = '';
-  // Add dataset name if available
-  if (app.model.args.datasetRef) {
-    const datasetOption = app.model.outputs.datasetOptions?.find((o) => plRefsEqual(o.ref, app.model.args.datasetRef!));
-    if (datasetOption?.label) {
-      label = datasetOption.label;
+// Auto-close settings panel when block starts running
+watch(
+  () => app.model.outputs.isRunning,
+  (isRunning, wasRunning) => {
+    // Close settings when block starts running (false -> true transition)
+    if (isRunning && !wasRunning) {
+      // Close the settings tab by setting currentTab to null
+      app.model.ui.graphState.currentTab = null;
     }
-  }
-
-  // Build secondary parts (points and extrapolation)
-  const secondaryParts: string[] = [];
-  if (app.model.args.numPoints) {
-    secondaryParts.push(`${app.model.args.numPoints} points`);
-  }
-  if (app.model.args.extrapolation) {
-    secondaryParts.push('extrapolated');
-  }
-
-  // Combine: "Dataset - 10 iter, extrapolated"
-  if (label && secondaryParts.length > 0) {
-    label = `${label} - ${secondaryParts.join(', ')}`;
-  } else if (secondaryParts.length > 0) {
-    label = secondaryParts.join(', ');
-  }
-
-  app.model.args.defaultBlockLabel = label || 'Select dataset';
-});
+  },
+);
 
 function setDatasetRef(datasetRef?: PlRef) {
   app.model.args.datasetRef = datasetRef;
 }
 
-const defaultOptions = computed((): PredefinedGraphOption<'scatterplot'>[] | undefined => {
+const defaultOptions = computed((): PredefinedGraphOption<'scatterplot'>[] | null => {
   const pCols = app.model.outputs.rarefactionPFrameCols;
   if (!pCols) {
-    return undefined;
+    return null;
   }
 
   function getColumnSpec(name: string, cols: PColumnSpec[]) {
@@ -58,7 +41,7 @@ const defaultOptions = computed((): PredefinedGraphOption<'scatterplot'>[] | und
   const shapeCol = getColumnSpec('pl7.app/vdj/rarefaction/type', pCols);
 
   if (!yCol || !shapeCol) {
-    return undefined;
+    return null;
   }
 
   return [
@@ -88,12 +71,12 @@ const key = computed(() => defaultOptions.value ? JSON.stringify(defaultOptions.
 <template>
   <PlBlockPage no-body-gutters>
     <GraphMaker
-      v-if="app.model.outputs.graphPFrame"
       :key="key"
       v-model="app.model.ui.graphState"
       chart-type="scatterplot"
       :p-frame="app.model.outputs.graphPFrame"
       :default-options="defaultOptions"
+      :status-text="{ noPframe: { title: strings.callToActions.configureSettingsAndRun } }"
     >
       <template #settingsSlot>
         <PlDropdownRef
@@ -136,7 +119,7 @@ const key = computed(() => defaultOptions.value ? JSON.stringify(defaultOptions.
             Extrapolate the number of unique clonotypes for depths greater than the total number of clonotypes.
           </template>
         </PlCheckbox>
-        <PlAccordionSection label="Advanced Settings">
+        <PlAccordionSection :label="strings.titles.advancedSettings">
           <PlNumberField
             v-model="app.model.args.mem"
             label="Memory (GiB)"
