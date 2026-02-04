@@ -76,7 +76,7 @@ export const model = BlockModel.create()
   /*************************
    *        OUTPUTS        *
    *************************/
-  .retentiveOutputWithStatus('graphPFrame', (ctx) => {
+  .outputWithStatus('graphPFrame', (ctx) => {
     const pCols = ctx.outputs?.resolve('rarefactionPFrame')?.getPColumns();
     if (pCols === undefined) {
       return undefined;
@@ -86,7 +86,7 @@ export const model = BlockModel.create()
   .output('rarefactionPFrameCols', (ctx) => {
     return ctx.outputs?.resolve('rarefactionPFrame')?.getPColumns()?.map((p) => p.spec);
   })
-  .retentiveOutputWithStatus('table', (ctx) => {
+  .outputWithStatus('table', (ctx) => {
     const cols = ctx.outputs?.resolve('rarefactionPFrame')?.getPColumns();
     if (cols === undefined) {
       return undefined;
