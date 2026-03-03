@@ -42,20 +42,17 @@ def get_rarefaction_depths(total_abundance: int, max_abundance: int, num_points_
     return sorted(list(depths))
 
 
-def rarefy(counts: np.ndarray, depth: int) -> float:
+def rarefy(unique_ni: np.ndarray, ni_counts: np.ndarray, s_obs: int, total_abundance: int, depth: int) -> float:
     """
     Perform analytical rarefaction (interpolation) using the combinatorial formula.
     """
-    total_abundance = int(counts.sum())
-    s_obs = len(counts)
-
     if depth >= total_abundance:
         return float(s_obs)
     if depth == 0:
         return 0.0
 
     sum_p_miss = 0.0
-    for ni in counts:
+    for ni, count in zip(unique_ni, ni_counts):
         if depth > total_abundance - ni:
             p_miss = 0.0
         else:
@@ -65,20 +62,15 @@ def rarefy(counts: np.ndarray, depth: int) -> float:
                 lgamma(total_abundance - depth + 1)
             )
             p_miss = exp(log_p_miss)
-        sum_p_miss += p_miss
+        sum_p_miss += (p_miss * count)
 
     return s_obs - sum_p_miss
 
 
-def extrapolate(counts: np.ndarray, depth: int) -> float:
+def extrapolate(s_obs: int, f1: int, f2: int, total_abundance: int, depth: int) -> float:
     """
     Perform analytical extrapolation to a given depth using the Chao1 formula.
     """
-    total_abundance = int(counts.sum())
-    s_obs = len(counts)
-    f1 = np.sum(counts == 1)
-    f2 = np.sum(counts == 2)
-
     if depth <= total_abundance:
         return float(s_obs)
 
@@ -123,6 +115,10 @@ def run_rarefaction(
         print(f"Error reading input file: {e}", file=sys.stderr)
         sys.exit(1)
 
+    print(f"Read {len(df)} rows from input TSV.")
+    print(f"Parameters: num_points={num_points}, num_iterations={num_iterations}, extrapolation={extrapolation}")
+    print("Pre-computing sample frequencies...")
+
     # Pre-computation pass to find max abundance and store sample data
     sample_data = {}
     max_abundance = 0
@@ -132,12 +128,24 @@ def run_rarefaction(
             sample_id_val, tuple) else sample_id_val
         abundances = sample_df["abundance"].to_numpy()
         total_abundance = int(abundances.sum())
-        sample_data[sample_id] = (abundances, total_abundance)
+        s_obs = len(abundances)
+        
+        # Calculate frequency values to avoid iterating over all counts
+        unique_ni, ni_counts = np.unique(abundances, return_counts=True)
+        
+        f1 = np.sum(abundances == 1)
+        f2 = np.sum(abundances == 2)
+        
+        sample_data[sample_id] = (unique_ni, ni_counts, s_obs, f1, f2, total_abundance)
         if total_abundance > max_abundance:
             max_abundance = total_abundance
 
+    print(f"Found {len(sample_data)} samples. Maximum sample abundance is {max_abundance}.")
+    print("Running rarefaction analysis...")
+
     results = []
-    for sample_id, (abundances, total_abundance) in sample_data.items():
+    total_samples = len(sample_data)
+    for sample_index, (sample_id, (unique_ni, ni_counts, s_obs, f1, f2, total_abundance)) in enumerate(sample_data.items()):
         if total_abundance == 0:
             results.append({
                 "pl7_app_sampleId": sample_id,
@@ -150,13 +158,14 @@ def run_rarefaction(
         depths = get_rarefaction_depths(
             total_abundance, max_abundance, num_points)
 
-        for depth in depths:
+        total_depths = len(depths)
+        for depth_index, depth in enumerate(depths):
             if depth <= total_abundance:
-                mean_richness = rarefy(abundances, depth)
+                mean_richness = rarefy(unique_ni, ni_counts, s_obs, total_abundance, depth)
                 point_type = "Interpolation"
             else:
                 if extrapolation:
-                    mean_richness = extrapolate(abundances, depth)
+                    mean_richness = extrapolate(s_obs, f1, f2, total_abundance, depth)
                     point_type = "Extrapolation"
                 else:
                     continue
@@ -168,6 +177,12 @@ def run_rarefaction(
                 "type": point_type
             })
 
+            # Print progress periodically (every 10%, or at least every 10 iterations)
+            progress_step = max(1, total_depths // 10)
+            if (depth_index + 1) % progress_step == 0 or (depth_index + 1) == total_depths:
+                progress_percent = int(((depth_index + 1) / total_depths) * 100)
+                print(f"Processed sample {sample_index + 1}/{total_samples}): {progress_percent}% complete", flush=True)
+
     try:
         results_df = pl.from_dicts(results)
         results_df.write_csv(output_tsv_filepath, separator='\t')
@@ -175,6 +190,7 @@ def run_rarefaction(
         print(f"Error writing output file: {e}", file=sys.stderr)
         sys.exit(1)
 
+    print(f"Successfully wrote {len(results_df)} points to {output_tsv_filepath}.")
     print("Rarefaction analysis complete.")
 
 
