@@ -1,5 +1,11 @@
 # @platforma-open/milaboratories.rarefaction.software
 
+## 1.2.5
+
+### Patch Changes
+
+- ab9a4ca: Optimized rarefaction computation performance and added periodic execution logs that propagate to the UI GraphMaker component.
+
 ## 1.2.4
 
 ### Patch Changes
