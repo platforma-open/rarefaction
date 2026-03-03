@@ -133,8 +133,13 @@ def run_rarefaction(
         # Calculate frequency values to avoid iterating over all counts
         unique_ni, ni_counts = np.unique(abundances, return_counts=True)
         
-        f1 = np.sum(abundances == 1)
-        f2 = np.sum(abundances == 2)
+        f1 = 0
+        f2 = 0
+        for val, count in zip(unique_ni, ni_counts):
+            if val == 1:
+                f1 = int(count)
+            elif val == 2:
+                f2 = int(count)
         
         sample_data[sample_id] = (unique_ni, ni_counts, s_obs, f1, f2, total_abundance)
         if total_abundance > max_abundance:
