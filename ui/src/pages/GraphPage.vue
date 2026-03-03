@@ -5,11 +5,13 @@ import '@milaboratories/graph-maker/styles';
 import strings from '@milaboratories/strings';
 import type { PlRef } from '@platforma-sdk/model';
 import { type PColumnSpec } from '@platforma-sdk/model';
-import { PlAccordionSection, PlBlockPage, PlCheckbox, PlDropdownRef, PlNumberField, PlTextField } from '@platforma-sdk/ui-vue';
-import { computed, watch } from 'vue';
+import { PlAccordionSection, PlBlockPage, PlCheckbox, PlDropdownRef, PlNumberField, PlTextField, PlBtnGhost, PlMaskIcon24, PlSlideModal, PlLogView } from '@platforma-sdk/ui-vue';
+import { computed, watch, ref } from 'vue';
 import { useApp } from '../app';
 
 const app = useApp();
+
+const logOpen = ref(false);
 
 // Auto-close settings panel when block starts running
 watch(
@@ -78,6 +80,14 @@ const key = computed(() => defaultOptions.value ? JSON.stringify(defaultOptions.
       :default-options="defaultOptions"
       :status-text="{ noPframe: { title: strings.callToActions.configureSettingsAndRun } }"
     >
+      <template #titleLineSlot>
+        <PlBtnGhost @click.stop="() => (logOpen = true)">
+          {{ strings.titles.logs }}
+          <template #append>
+            <PlMaskIcon24 name="file-logs" />
+          </template>
+        </PlBtnGhost>
+      </template>
       <template #settingsSlot>
         <PlDropdownRef
           v-model="app.model.args.datasetRef"
@@ -143,5 +153,9 @@ const key = computed(() => defaultOptions.value ? JSON.stringify(defaultOptions.
         </PlAccordionSection>
       </template>
     </GraphMaker>
+    <PlSlideModal v-model="logOpen" width="80%">
+      <template #title>Rarefaction Log</template>
+      <PlLogView :log-handle="app.model.outputs.rarefactionLogs"/>
+    </PlSlideModal>
   </PlBlockPage>
 </template>
