@@ -140,7 +140,8 @@ wf.body(func(args) {
 	return {
 		outputs: {
 			rarefactionPFrame: pframes.exportFrame(tracedPFrame),
-			rarefactionLogs: rarefactionRender.output("rarefactionLogs")
+			rarefactionLogs: rarefactionRender.output("rarefactionLogs"),
+			noData: rarefactionRender.output("noData")
 		},
 		exports: {}
 	}

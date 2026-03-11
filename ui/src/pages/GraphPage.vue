@@ -5,7 +5,7 @@ import '@milaboratories/graph-maker/styles';
 import strings from '@milaboratories/strings';
 import type { PlRef } from '@platforma-sdk/model';
 import { type PColumnSpec } from '@platforma-sdk/model';
-import { PlAccordionSection, PlBlockPage, PlCheckbox, PlDropdownRef, PlNumberField, PlTextField, PlBtnGhost, PlMaskIcon24, PlSlideModal, PlLogView } from '@platforma-sdk/ui-vue';
+import { PlAccordionSection, PlAlert, PlBlockPage, PlCheckbox, PlDropdownRef, PlNumberField, PlTextField, PlBtnGhost, PlMaskIcon24, PlSlideModal, PlLogView } from '@platforma-sdk/ui-vue';
 import { computed, watch, ref } from 'vue';
 import { useApp } from '../app';
 
@@ -72,9 +72,13 @@ const key = computed(() => defaultOptions.value ? JSON.stringify(defaultOptions.
 
 <template>
   <PlBlockPage no-body-gutters>
+    <PlAlert v-if="app.model.outputs.noData" type="warn" icon style="margin: 12px 12px 0">
+      No clonotypes found in the selected dataset. Please check your input data.
+    </PlAlert>
     <GraphMaker
       :key="key"
       v-model="app.model.ui.graphState"
+      style="flex: 1; min-height: 0"
       chart-type="scatterplot"
       :p-frame="app.model.outputs.graphPFrame"
       :default-options="defaultOptions"

@@ -121,6 +121,8 @@ export const model = BlockModel.create()
 
   .output('isRunning', (ctx) => ctx.outputs?.getIsReadyOrError() === false)
 
+  .output('noData', (ctx) => ctx.outputs?.resolve('noData')?.getDataAsJson<boolean>())
+
   .output('rarefactionLogs', (ctx) => ctx.outputs?.resolve('rarefactionLogs')?.getLogHandle())
 
   /*************************
