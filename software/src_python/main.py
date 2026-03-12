@@ -188,12 +188,26 @@ def run_rarefaction(
                 progress_percent = int(((depth_index + 1) / total_depths) * 100)
                 print(f"Processed sample {sample_index + 1}/{total_samples}): {progress_percent}% complete", flush=True)
 
+    no_data = len(results) == 0
+
     try:
-        results_df = pl.from_dicts(results)
+        if results:
+            results_df = pl.from_dicts(results)
+        else:
+            print("Warning: No clonotypes found in input. Writing empty output.", file=sys.stderr)
+            results_df = pl.DataFrame(schema={
+                "pl7_app_sampleId": pl.String,
+                "subsampling_depth": pl.Int64,
+                "mean_unique_clonotypes": pl.String,
+                "type": pl.String,
+            })
         results_df.write_csv(output_tsv_filepath, separator='\t')
     except Exception as e:
         print(f"Error writing output file: {e}", file=sys.stderr)
         sys.exit(1)
+
+    with open("noData.txt", "w") as f:
+        f.write("true" if no_data else "false")
 
     print(f"Successfully wrote {len(results_df)} points to {output_tsv_filepath}.")
     print("Rarefaction analysis complete.")

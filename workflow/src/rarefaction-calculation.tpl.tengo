@@ -17,7 +17,7 @@ self.validateInputs({
     }
 })
 
-self.defineOutputs(["rarefactionOutput", "rarefactionLogs"])
+self.defineOutputs(["rarefactionOutput", "rarefactionLogs", "noData"])
 
 self.body(func(args) {
     // Get input parameters
@@ -42,6 +42,7 @@ self.body(func(args) {
             arg(numIterations).
             arg(string(extrapolation)).
             saveFile(outfile).
+            saveFileContent("noData.txt").
             saveStdoutStream().
             cacheMinutes(4*60).
             printErrStreamToStdout().
@@ -49,6 +50,7 @@ self.body(func(args) {
 
     return {
         rarefactionOutput: rarefactionCmd.getFile(outfile),
-        rarefactionLogs: rarefactionCmd.getStdoutStream()
+        rarefactionLogs: rarefactionCmd.getStdoutStream(),
+        noData: rarefactionCmd.getFileContent("noData.txt")
     }
 })
