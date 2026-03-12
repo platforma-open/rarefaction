@@ -78,7 +78,6 @@ const key = computed(() => defaultOptions.value ? JSON.stringify(defaultOptions.
     <GraphMaker
       :key="key"
       v-model="app.model.ui.graphState"
-      style="flex: 1; min-height: 0"
       chart-type="scatterplot"
       :p-frame="app.model.outputs.graphPFrame"
       :default-options="defaultOptions"
