@@ -1,5 +1,11 @@
 # @platforma-open/milaboratories.rarefaction.software
 
+## 1.2.6
+
+### Patch Changes
+
+- 770f778: Show warning when selected dataset contains no clonotypes
+
 ## 1.2.5
 
 ### Patch Changes
