@@ -122,9 +122,7 @@ wf.body(func(args) {
 	})
 
     rarefactionPFrame := xsv.importFile(rarefactionRender.output("rarefactionOutput"), "tsv", getSpec(datasetSpec, args), {
-		splitDataAndSpec: true,
-		mem: convMem,
-		cpu: 1
+		splitDataAndSpec: true
 	})
     
     trace := pSpec.makeTrace(
