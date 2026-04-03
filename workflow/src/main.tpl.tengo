@@ -100,7 +100,11 @@ wf.prepare(func(args) {
 wf.body(func(args) {
 
 	datasetSpec := args.columns.getSpec(args.datasetRef)
+	convMem := string(args.mem) + "GiB"
+
     tsvBuilder := pframes.tsvFileBuilder()
+	tsvBuilder.mem(convMem)
+	tsvBuilder.cpu(1)
     tsvBuilder.add(args.columns.getColumn("abundance"), {header: "abundance"})
     tsvBuilder.setAxisHeader(datasetSpec.axesSpec[1].name, "clonotypeKey")
     tsv := tsvBuilder.build()
@@ -118,7 +122,9 @@ wf.body(func(args) {
 	})
 
     rarefactionPFrame := xsv.importFile(rarefactionRender.output("rarefactionOutput"), "tsv", getSpec(datasetSpec, args), {
-		splitDataAndSpec: true
+		splitDataAndSpec: true,
+		mem: convMem,
+		cpu: 1
 	})
     
     trace := pSpec.makeTrace(
