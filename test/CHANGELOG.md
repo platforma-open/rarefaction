@@ -1,5 +1,11 @@
 # @platforma-open/milaboratories.rarefaction.test
 
+## 1.0.4
+
+### Patch Changes
+
+- 64ccb8d: Fix build for new SDK: update ts-builder CLI usage, remove removed style imports
+
 ## 1.0.3
 
 ### Patch Changes

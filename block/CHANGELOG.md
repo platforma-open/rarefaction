@@ -1,5 +1,17 @@
 # @platforma-open/milaboratories.rarefaction
 
+## 1.0.19
+
+### Patch Changes
+
+- 1573d0e: Update SDK dependencies to latest versions
+- Updated dependencies [64ccb8d]
+- Updated dependencies [0075c7e]
+- Updated dependencies [1573d0e]
+  - @platforma-open/milaboratories.rarefaction.model@1.3.4
+  - @platforma-open/milaboratories.rarefaction.ui@1.3.4
+  - @platforma-open/milaboratories.rarefaction.workflow@1.1.9
+
 ## 1.0.18
 
 ### Patch Changes

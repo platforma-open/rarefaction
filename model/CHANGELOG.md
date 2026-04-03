@@ -1,5 +1,12 @@
 # @platforma-open/milaboratories.rarefaction.model
 
+## 1.3.4
+
+### Patch Changes
+
+- 64ccb8d: Fix build for new SDK: update ts-builder CLI usage, remove removed style imports
+- 1573d0e: Update SDK dependencies to latest versions
+
 ## 1.3.3
 
 ### Patch Changes

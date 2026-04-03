@@ -1,5 +1,12 @@
 # @platforma-open/milaboratories.rarefaction.workflow
 
+## 1.1.9
+
+### Patch Changes
+
+- 0075c7e: Propagate user memory setting to TSV builder to prevent OOM on large datasets
+- 1573d0e: Update SDK dependencies to latest versions
+
 ## 1.1.8
 
 ### Patch Changes

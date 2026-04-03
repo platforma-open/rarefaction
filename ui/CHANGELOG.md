@@ -1,5 +1,15 @@
 # @platforma-open/milaboratories.rarefaction.ui
 
+## 1.3.4
+
+### Patch Changes
+
+- 64ccb8d: Fix build for new SDK: update ts-builder CLI usage, remove removed style imports
+- 1573d0e: Update SDK dependencies to latest versions
+- Updated dependencies [64ccb8d]
+- Updated dependencies [1573d0e]
+  - @platforma-open/milaboratories.rarefaction.model@1.3.4
+
 ## 1.3.3
 
 ### Patch Changes
