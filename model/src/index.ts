@@ -2,6 +2,7 @@ import type { GraphMakerState } from '@milaboratories/graph-maker';
 import type { InferOutputsType, PlDataTableStateV2, PlRef } from '@platforma-sdk/model';
 import { BlockModel, createPFrameForGraphs, createPlDataTableStateV2, createPlDataTableV2 } from '@platforma-sdk/model';
 import { getDefaultBlockLabel } from './label';
+export type * from '@milaboratories/helpers';
 
 // validation rules
 function numRule(num: string | undefined): boolean {
