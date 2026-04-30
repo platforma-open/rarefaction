@@ -19,13 +19,13 @@ getSpec := func(abundanceSpec, args) {
 			{
 				column: "subsampling_depth",
 				spec: {
-					name: "pl7.app/vdj/rarefaction/depth",
+					name: "pl7.app/rarefaction/depth",
 					type: "Int",
 					domain: maps.merge(
 						abundanceSpec.domain,
 						{
-							"pl7.app/vdj/rarefaction/numPoints": args.numPoints,
-							"pl7.app/vdj/rarefaction/numIterations": args.numIterations
+							"pl7.app/rarefaction/numPoints": args.numPoints,
+							"pl7.app/rarefaction/numIterations": args.numIterations
 						}
 					),
 					annotations: {
@@ -38,17 +38,17 @@ getSpec := func(abundanceSpec, args) {
 			{
 				column: "mean_unique_clonotypes",
 				spec: {
-					name: "pl7.app/vdj/rarefaction/meanUniqueClonotypes",
+					name: "pl7.app/rarefaction/meanUniqueSequences",
 					valueType: "Double",
 					domain: maps.merge(
 						abundanceSpec.domain,
 						{
-							"pl7.app/vdj/rarefaction/numPoints": args.numPoints,
-							"pl7.app/vdj/rarefaction/numIterations": args.numIterations
+							"pl7.app/rarefaction/numPoints": args.numPoints,
+							"pl7.app/rarefaction/numIterations": args.numIterations
 						}
 					),
 					annotations: {
-						"pl7.app/label": "Mean unique clonotypes",
+						"pl7.app/label": "Mean unique sequences",
 						"pl7.app/format": ".2f"
 					}
 				}
@@ -56,13 +56,13 @@ getSpec := func(abundanceSpec, args) {
 			{
 				column: "type",
 				spec: {
-					name: "pl7.app/vdj/rarefaction/type",
+					name: "pl7.app/rarefaction/type",
 					valueType: "String",
 					domain: maps.merge(
 						abundanceSpec.domain,
 						{
-							"pl7.app/vdj/rarefaction/numPoints": args.numPoints,
-							"pl7.app/vdj/rarefaction/numIterations": args.numIterations
+							"pl7.app/rarefaction/numPoints": args.numPoints,
+							"pl7.app/rarefaction/numIterations": args.numIterations
 						}
 					),
 					annotations: {
@@ -106,7 +106,7 @@ wf.body(func(args) {
 	tsvBuilder.mem(convMem)
 	tsvBuilder.cpu(1)
     tsvBuilder.add(args.columns.getColumn("abundance"), {header: "abundance"})
-    tsvBuilder.setAxisHeader(datasetSpec.axesSpec[1].name, "clonotypeKey")
+    tsvBuilder.setAxisHeader(datasetSpec.axesSpec[1].name, "sequenceKey")
     tsv := tsvBuilder.build()
 
 	// Call UMAP calculation subtemplate

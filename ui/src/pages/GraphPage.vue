@@ -38,8 +38,8 @@ const defaultOptions = computed((): PredefinedGraphOption<'scatterplot'>[] | nul
     return cols.find((p) => p.name === name);
   }
 
-  const yCol = getColumnSpec('pl7.app/vdj/rarefaction/meanUniqueClonotypes', pCols);
-  const shapeCol = getColumnSpec('pl7.app/vdj/rarefaction/type', pCols);
+  const yCol = getColumnSpec('pl7.app/rarefaction/meanUniqueSequences', pCols);
+  const shapeCol = getColumnSpec('pl7.app/rarefaction/type', pCols);
 
   if (!yCol || !shapeCol) {
     return null;
@@ -72,7 +72,7 @@ const key = computed(() => defaultOptions.value ? JSON.stringify(defaultOptions.
 <template>
   <PlBlockPage no-body-gutters>
     <PlAlert v-if="app.model.outputs.noData" type="warn" icon style="margin: 12px 12px 0">
-      No clonotypes found in the selected dataset. Please check your input data.
+      No sequences found in the selected dataset. Please check your input data.
     </PlAlert>
     <GraphMaker
       :key="key"
