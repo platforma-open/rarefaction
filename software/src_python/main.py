@@ -109,7 +109,7 @@ def run_rarefaction(
         df = pl.read_csv(input_tsv_filepath, separator='\t')
         df = df.rename({
             "pl7_app_sampleId": "sample_id",
-            "clonotypeKey": "clonotype_key"
+            "sequenceKey": "sequence_key"
         })
     except Exception as e:
         print(f"Error reading input file: {e}", file=sys.stderr)

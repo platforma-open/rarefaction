@@ -2,6 +2,7 @@ import type { GraphMakerState } from '@milaboratories/graph-maker';
 import type { InferOutputsType, PlDataTableStateV2, PlRef } from '@platforma-sdk/model';
 import { BlockModel, createPFrameForGraphs, createPlDataTableStateV2, createPlDataTableV2 } from '@platforma-sdk/model';
 import { getDefaultBlockLabel } from './label';
+export type * from '@milaboratories/helpers';
 
 // validation rules
 function numRule(num: string | undefined): boolean {
@@ -99,7 +100,7 @@ export const model = BlockModel.create()
     );
   })
 
-  // Get MiXCR outputs from the result pool
+  // Get MiXCR outputs and peptide-extraction outputs from the result pool
   .output('datasetOptions', (ctx) =>
     ctx.resultPool.getOptions([{
       axes: [
@@ -111,6 +112,12 @@ export const model = BlockModel.create()
       axes: [
         { name: 'pl7.app/sampleId' },
         { name: 'pl7.app/vdj/scClonotypeKey' },
+      ],
+      annotations: { 'pl7.app/isAnchor': 'true' },
+    }, {
+      axes: [
+        { name: 'pl7.app/sampleId' },
+        { name: 'pl7.app/variantKey' },
       ],
       annotations: { 'pl7.app/isAnchor': 'true' },
     }]),
