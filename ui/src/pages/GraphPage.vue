@@ -128,7 +128,7 @@ const key = computed(() => defaultOptions.value ? JSON.stringify(defaultOptions.
         >
           Extrapolate to largest sample
           <template #tooltip>
-            Extrapolate the number of unique clonotypes for depths greater than the total number of clonotypes.
+            Extrapolate the number of unique sequences for depths greater than the total number of sequences.
           </template>
         </PlCheckbox>
         <PlAccordionSection :label="strings.titles.advancedSettings">
