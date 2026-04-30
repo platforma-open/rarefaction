@@ -1,5 +1,11 @@
 # @platforma-open/milaboratories.rarefaction.model
 
+## 2.0.0
+
+### Major Changes
+
+- 654a905: Support peptides
+
 ## 1.3.4
 
 ### Patch Changes

@@ -1,5 +1,18 @@
 # @platforma-open/milaboratories.rarefaction
 
+## 2.0.0
+
+### Major Changes
+
+- 654a905: Support peptides
+
+### Patch Changes
+
+- Updated dependencies [654a905]
+  - @platforma-open/milaboratories.rarefaction.workflow@2.0.0
+  - @platforma-open/milaboratories.rarefaction.model@2.0.0
+  - @platforma-open/milaboratories.rarefaction.ui@2.0.0
+
 ## 1.0.19
 
 ### Patch Changes
