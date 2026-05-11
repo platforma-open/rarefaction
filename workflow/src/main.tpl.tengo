@@ -100,14 +100,20 @@ wf.prepare(func(args) {
 
 wf.body(func(args) {
 
-	// Materialize the pframes-rs WASM component handle. Returns undefined
-	// today (runtime wiring lands in plan/tengo-wasm-call). The call site
-	// is here so once the runtime ships, only the SDK wrapper changes —
-	// this block stays as-is. The handle will expose `.frame`, `.table`,
-	// `.axes` namespaces mapping onto the wasip2 WIT exports.
-	pframesRsHandle := pframesRs.importWasm()
-
 	datasetSpec := args.columns.getSpec(args.datasetRef)
+
+	// Ask the pframes-rs WASM component to build a v1 query for the
+	// `abundance` column. Returns an error today because the wasm-call
+	// runtime is still on plan/tengo-wasm-call; once that lands, only
+	// the SDK wrapper changes and the call below starts returning a real
+	// SpecQueryJoinEntry. The block tolerates the runtime-gap error so
+	// rendering proceeds in the meantime.
+	wasmQueryRequest := { version: "v1", column: "abundance" }
+	wasmBuiltQuery := pframesRs.frame.buildQuery(wasmQueryRequest)
+	if is_error(wasmBuiltQuery) {
+		ll.print("pframes-rs.frame.buildQuery unavailable, continuing without wasm-built query: " + string(wasmBuiltQuery))
+	}
+
 	convMem := string(args.mem) + "GiB"
 
     tsvBuilder := pframes.tsvFileBuilder()
