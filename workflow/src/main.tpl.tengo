@@ -100,6 +100,13 @@ wf.prepare(func(args) {
 
 wf.body(func(args) {
 
+	// Materialize the pframes-rs WASM component handle. Returns undefined
+	// today (runtime wiring lands in plan/tengo-wasm-call). The call site
+	// is here so once the runtime ships, only the SDK wrapper changes —
+	// this block stays as-is. The handle will expose `.frame`, `.table`,
+	// `.axes` namespaces mapping onto the wasip2 WIT exports.
+	pframesRsHandle := pframesRs.importWasm()
+
 	datasetSpec := args.columns.getSpec(args.datasetRef)
 	convMem := string(args.mem) + "GiB"
 
