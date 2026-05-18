@@ -108,11 +108,11 @@ wf.body(func(args) {
 	// the SDK wrapper changes and the call below starts returning a real
 	// SpecQueryJoinEntry. The block tolerates the runtime-gap error so
 	// rendering proceeds in the meantime.
-	wasmQueryRequest := { version: "v1", column: "abundance" }
-	wasmBuiltQuery := pframesRs.frame.buildQuery(wasmQueryRequest)
-	if is_error(wasmBuiltQuery) {
-		ll.print("pframes-rs.frame.buildQuery unavailable, continuing without wasm-built query: " + string(wasmBuiltQuery))
-	}
+	// wasmQueryRequest := { version: "v1", column: "abundance" }
+	// wasmBuiltQuery := pframesRs.frame.buildQuery(wasmQueryRequest)
+	// if is_error(wasmBuiltQuery) {
+	// 	ll.print("pframes-rs.frame.buildQuery unavailable, continuing without wasm-built query: " + string(wasmBuiltQuery))
+	// }
 
 	convMem := string(args.mem) + "GiB"
 
