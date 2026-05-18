@@ -1,5 +1,13 @@
 # @platforma-open/milaboratories.rarefaction.ui
 
+## 2.0.1
+
+### Patch Changes
+
+- 60ead39: Remove telegram
+- Updated dependencies [60ead39]
+  - @platforma-open/milaboratories.rarefaction.model@2.0.1
+
 ## 2.0.0
 
 ### Major Changes

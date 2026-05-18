@@ -1,5 +1,11 @@
 # @platforma-open/milaboratories.rarefaction.software
 
+## 2.0.1
+
+### Patch Changes
+
+- 60ead39: Remove telegram
+
 ## 2.0.0
 
 ### Major Changes

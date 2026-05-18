@@ -1,5 +1,11 @@
 # @platforma-open/milaboratories.rarefaction.test
 
+## 1.0.5
+
+### Patch Changes
+
+- 60ead39: Remove telegram
+
 ## 1.0.4
 
 ### Patch Changes
