@@ -54,7 +54,7 @@ const blockDataModel = new DataModelBuilder()
 function isValidNum(num: string | undefined): boolean {
   if (num === undefined) return false;
   const v = Number(num);
-  return Number.isFinite(v) && v > 0 && v < 10000;
+  return Number.isInteger(v) && v > 0 && v < 10000;
 }
 
 function deriveSubtitle(data: BlockData): string {

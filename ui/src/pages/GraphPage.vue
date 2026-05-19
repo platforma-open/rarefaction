@@ -15,7 +15,6 @@ import {
   PlMaskIcon24,
   PlNumberField,
   PlSlideModal,
-  PlTextField,
 } from '@platforma-sdk/ui-vue';
 import { computed, ref, watch } from 'vue';
 import { useApp } from '../app';
@@ -36,15 +35,42 @@ watch(
 
 const datasetRefModel = computed({
   get: () => app.model.data.datasetRef,
-  set: (ref: PlRef | undefined) => {
-    app.model.data.datasetRef = ref;
+  set: (selectedRef: PlRef | undefined) => {
+    app.model.data.datasetRef = selectedRef;
     // Snapshot the chosen dataset's human label into `data` so `.subtitle`
     // can derive the default block label without re-querying the result pool.
-    app.model.data.datasetLabel = ref
-      ? app.model.outputs.datasetOptions?.find((o) => plRefsEqual(o.ref, ref))?.label
+    app.model.data.datasetLabel = selectedRef
+      ? app.model.outputs.datasetOptions?.find((o) => plRefsEqual(o.ref, selectedRef))?.label
       : undefined;
   },
 });
+
+// Bridge string-typed data fields (kept as string to satisfy the workflow's
+// "string" subtemplate validation and the string-typed domain values in
+// column specs) to PlNumberField's numeric v-model.
+const numPointsModel = computed({
+  get: () => {
+    const n = Number(app.model.data.numPoints);
+    return Number.isFinite(n) ? n : undefined;
+  },
+  set: (v) => { app.model.data.numPoints = v === undefined ? '' : String(v); },
+});
+
+const numIterationsModel = computed({
+  get: () => {
+    const n = Number(app.model.data.numIterations);
+    return Number.isFinite(n) ? n : undefined;
+  },
+  set: (v) => { app.model.data.numIterations = v === undefined ? '' : String(v); },
+});
+
+function validateIntCount(value: number | undefined): string | undefined {
+  if (value === undefined) return 'Required';
+  if (!Number.isInteger(value)) return 'Must be an integer';
+  if (value < 1) return 'Must be at least 1';
+  if (value >= 10000) return 'Must be less than 10000';
+  return undefined;
+}
 
 const defaultOptions = computed((): PredefinedGraphOption<'scatterplot'>[] | null => {
   const pCols = app.model.outputs.rarefactionPFrameCols;
@@ -100,24 +126,34 @@ const defaultOptions = computed((): PredefinedGraphOption<'scatterplot'>[] | nul
             Select the dataset to be used for the rarefaction analysis.
           </template>
         </PlDropdownRef>
-        <PlTextField
-          v-model="app.model.data.numPoints"
+        <PlNumberField
+          v-model="numPointsModel"
           label="Input points number"
+          :min="1"
+          :max="9999"
+          :step="1"
+          required
+          :validate="validateIntCount"
           :disabled="app.model.outputs.isRunning"
         >
           <template #tooltip>
             The number of subsampling depths to be used for the rarefaction analysis.
           </template>
-        </PlTextField>
-        <PlTextField
-          v-model="app.model.data.numIterations"
+        </PlNumberField>
+        <PlNumberField
+          v-model="numIterationsModel"
           label="Number of iterations per depth"
+          :min="1"
+          :max="9999"
+          :step="1"
+          required
+          :validate="validateIntCount"
           :disabled="app.model.outputs.isRunning"
         >
           <template #tooltip>
             The number of times the subsampling will be repeated at each depth.
           </template>
-        </PlTextField>
+        </PlNumberField>
         <PlCheckbox
           v-model="app.model.data.extrapolation"
           label="Extrapolation"
