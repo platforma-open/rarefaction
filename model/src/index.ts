@@ -1,106 +1,106 @@
-import type { GraphMakerState } from '@milaboratories/graph-maker';
-import type { InferOutputsType, PlDataTableStateV2, PlRef } from '@platforma-sdk/model';
-import { BlockModel, createPFrameForGraphs, createPlDataTableStateV2, createPlDataTableV2 } from '@platforma-sdk/model';
+import type { InferOutputsType } from '@platforma-sdk/model';
+import {
+  BlockModelV3,
+  createPFrameForGraphs,
+  createPlDataTableStateV2,
+  createPlDataTableV2,
+  DataModelBuilder,
+} from '@platforma-sdk/model';
 import { getDefaultBlockLabel } from './label';
+import type {
+  BlockArgs,
+  BlockData,
+  LegacyBlockArgs,
+  LegacyBlockUiState,
+} from './types';
+
 export type * from '@milaboratories/helpers';
 
-// validation rules
-function numRule(num: string | undefined): boolean {
-  const numValue = Number(num);
-  return numValue > 0 && numValue < 10000;
-}
+const defaultGraphState = (): BlockData['graphState'] => ({
+  title: 'Rarefaction Curves',
+  template: 'curve_dots',
+  currentTab: 'settings',
+});
 
-function numRuleError(num: string | undefined): boolean | string {
-  if (numRule(num)) {
-    return 'Input a number between 1 and 100';
-  }
-  return true;
-}
-
-export type BlockArgs = {
-  defaultBlockLabel: string;
-  customBlockLabel: string;
-  numPoints: string;
-  numIterations: string;
-  extrapolation: boolean;
-  mem?: number;
-  cpu?: number;
-  datasetRef?: PlRef;
-  numRules?: ((num: string) => boolean | string)[]; // todo find a way to show text field err
-};
-
-export type UiState = {
-  tableState: PlDataTableStateV2;
-  graphState: GraphMakerState;
-};
-
-/*************************
- *         MODEL         *
- *************************/
-export const model = BlockModel.create()
-
-  /*************************
-   *          ARGS         *
-   *************************/
-  .withArgs<BlockArgs>({
-    defaultBlockLabel: getDefaultBlockLabel({
-      numPoints: '20',
-      extrapolation: true,
-    }),
+const blockDataModel = new DataModelBuilder()
+  .from<BlockData>('V20260518')
+  .upgradeLegacy<LegacyBlockArgs, LegacyBlockUiState>(({ args, uiState }) => ({
+    customBlockLabel: args?.customBlockLabel ?? '',
+    datasetRef: args?.datasetRef,
+    // No V1 source for `datasetLabel`: V1 carried only the full
+    // `defaultBlockLabel` string. Reseeded on the next dataset-picker gesture.
+    datasetLabel: undefined,
+    numPoints: args?.numPoints ?? '20',
+    numIterations: args?.numIterations ?? '100',
+    extrapolation: args?.extrapolation ?? true,
+    mem: args?.mem ?? 8,
+    cpu: args?.cpu ?? 4,
+    tableState: uiState?.tableState ?? createPlDataTableStateV2(),
+    graphState: uiState?.graphState ?? defaultGraphState(),
+  }))
+  .init(() => ({
     customBlockLabel: '',
-    numRules: [numRuleError],
+    datasetRef: undefined,
+    datasetLabel: undefined,
     numPoints: '20',
     numIterations: '100',
     extrapolation: true,
     mem: 8,
     cpu: 4,
+    tableState: createPlDataTableStateV2(),
+    graphState: defaultGraphState(),
+  }));
+
+function isValidNum(num: string | undefined): boolean {
+  if (num === undefined) return false;
+  const v = Number(num);
+  return Number.isInteger(v) && v > 0 && v < 10000;
+}
+
+function deriveSubtitle(data: BlockData): string {
+  if (data.customBlockLabel) return data.customBlockLabel;
+  return getDefaultBlockLabel({
+    datasetLabel: data.datasetLabel,
+    numPoints: data.numPoints,
+    extrapolation: data.extrapolation,
+  }) || '';
+}
+
+export const platforma = BlockModelV3.create(blockDataModel)
+
+  .args<BlockArgs>((data) => {
+    if (data.datasetRef === undefined) throw new Error('Dataset is required');
+    if (!isValidNum(data.numPoints)) throw new Error('Number of points must be between 1 and 9999');
+    if (!isValidNum(data.numIterations)) throw new Error('Number of iterations must be between 1 and 9999');
+    if (data.mem === undefined) throw new Error('Memory is required');
+    if (data.cpu === undefined) throw new Error('CPU is required');
+
+    return {
+      datasetRef: data.datasetRef,
+      numPoints: data.numPoints.trim(),
+      numIterations: data.numIterations.trim(),
+      extrapolation: data.extrapolation,
+      mem: data.mem,
+      cpu: data.cpu,
+    };
   })
 
-  /*************************
-   *        UI STATE       *
-   *************************/
-  .withUiState<UiState>({
-    tableState: createPlDataTableStateV2(),
-    graphState: {
-      title: 'Rarefaction Curves',
-      template: 'curve_dots',
-      currentTab: 'settings',
-    },
-  },
-  )
-  .argsValid((ctx) => (
-    ctx.args.datasetRef !== undefined
-    && numRule(ctx.args.numPoints)
-    && numRule(ctx.args.numIterations)
-  ))
-
-  /*************************
-   *        OUTPUTS        *
-   *************************/
   .outputWithStatus('graphPFrame', (ctx) => {
     const pCols = ctx.outputs?.resolve('rarefactionPFrame')?.getPColumns();
-    if (pCols === undefined) {
-      return undefined;
-    }
+    if (pCols === undefined) return undefined;
     return createPFrameForGraphs(ctx, pCols);
   })
-  .output('rarefactionPFrameCols', (ctx) => {
-    return ctx.outputs?.resolve('rarefactionPFrame')?.getPColumns()?.map((p) => p.spec);
-  })
+
+  .output('rarefactionPFrameCols', (ctx) =>
+    ctx.outputs?.resolve('rarefactionPFrame')?.getPColumns()?.map((p) => p.spec),
+  )
+
   .outputWithStatus('table', (ctx) => {
     const cols = ctx.outputs?.resolve('rarefactionPFrame')?.getPColumns();
-    if (cols === undefined) {
-      return undefined;
-    }
-
-    return createPlDataTableV2(
-      ctx,
-      cols,
-      ctx.uiState.tableState,
-    );
+    if (cols === undefined) return undefined;
+    return createPlDataTableV2(ctx, cols, ctx.data.tableState);
   })
 
-  // Get MiXCR outputs and peptide-extraction outputs from the result pool
   .output('datasetOptions', (ctx) =>
     ctx.resultPool.getOptions([{
       axes: [
@@ -122,9 +122,6 @@ export const model = BlockModel.create()
       annotations: { 'pl7.app/isAnchor': 'true' },
     }]),
   )
-  .title(() => 'Rarefaction')
-
-  .subtitle((ctx) => ctx.args.customBlockLabel || ctx.args.defaultBlockLabel || '')
 
   .output('isRunning', (ctx) => ctx.outputs?.getIsReadyOrError() === false)
 
@@ -132,15 +129,19 @@ export const model = BlockModel.create()
 
   .output('rarefactionLogs', (ctx) => ctx.outputs?.resolve('rarefactionLogs')?.getLogHandle())
 
-  /*************************
-   *        SECTIONS       *
-   *************************/
-  .sections((_ctx) => [
-    { type: 'link', href: '/', label: 'Curves' },
-    { type: 'link', href: '/table', label: 'Table' },
-  ])
-  .done(2);
+  .title(() => 'Rarefaction')
 
-export type BlockOutputs = InferOutputsType<typeof model>;
+  .subtitle((ctx) => deriveSubtitle(ctx.data))
+
+  .sections((_ctx) => [
+    { type: 'link' as const, href: '/' as const, label: 'Curves' },
+    { type: 'link' as const, href: '/table' as const, label: 'Table' },
+  ])
+
+  .done();
+
+export type Platforma = typeof platforma;
+export type BlockOutputs = InferOutputsType<typeof platforma>;
 
 export { getDefaultBlockLabel } from './label';
+export * from './types';
