@@ -2,10 +2,22 @@
 import type { PredefinedGraphOption } from '@milaboratories/graph-maker';
 import { GraphMaker } from '@milaboratories/graph-maker';
 import strings from '@milaboratories/strings';
-import type { PlRef } from '@platforma-sdk/model';
-import { type PColumnSpec } from '@platforma-sdk/model';
-import { PlAccordionSection, PlAlert, PlBlockPage, PlCheckbox, PlDropdownRef, PlNumberField, PlTextField, PlBtnGhost, PlMaskIcon24, PlSlideModal, PlLogView } from '@platforma-sdk/ui-vue';
-import { computed, watch, ref } from 'vue';
+import type { PColumnSpec, PlRef } from '@platforma-sdk/model';
+import { plRefsEqual } from '@platforma-sdk/model';
+import {
+  PlAccordionSection,
+  PlAlert,
+  PlBlockPage,
+  PlBtnGhost,
+  PlCheckbox,
+  PlDropdownRef,
+  PlLogView,
+  PlMaskIcon24,
+  PlNumberField,
+  PlSlideModal,
+  PlTextField,
+} from '@platforma-sdk/ui-vue';
+import { computed, ref, watch } from 'vue';
 import { useApp } from '../app';
 
 const app = useApp();
@@ -16,23 +28,27 @@ const logOpen = ref(false);
 watch(
   () => app.model.outputs.isRunning,
   (isRunning, wasRunning) => {
-    // Close settings when block starts running (false -> true transition)
     if (isRunning && !wasRunning) {
-      // Close the settings tab by setting currentTab to null
-      app.model.ui.graphState.currentTab = null;
+      app.model.data.graphState.currentTab = null;
     }
   },
 );
 
-function setDatasetRef(datasetRef?: PlRef) {
-  app.model.args.datasetRef = datasetRef;
-}
+const datasetRefModel = computed({
+  get: () => app.model.data.datasetRef,
+  set: (ref: PlRef | undefined) => {
+    app.model.data.datasetRef = ref;
+    // Snapshot the chosen dataset's human label into `data` so `.subtitle`
+    // can derive the default block label without re-querying the result pool.
+    app.model.data.datasetLabel = ref
+      ? app.model.outputs.datasetOptions?.find((o) => plRefsEqual(o.ref, ref))?.label
+      : undefined;
+  },
+});
 
 const defaultOptions = computed((): PredefinedGraphOption<'scatterplot'>[] | null => {
   const pCols = app.model.outputs.rarefactionPFrameCols;
-  if (!pCols) {
-    return null;
-  }
+  if (!pCols) return null;
 
   function getColumnSpec(name: string, cols: PColumnSpec[]) {
     return cols.find((p) => p.name === name);
@@ -41,32 +57,15 @@ const defaultOptions = computed((): PredefinedGraphOption<'scatterplot'>[] | nul
   const yCol = getColumnSpec('pl7.app/rarefaction/meanUniqueSequences', pCols);
   const shapeCol = getColumnSpec('pl7.app/rarefaction/type', pCols);
 
-  if (!yCol || !shapeCol) {
-    return null;
-  }
+  if (!yCol || !shapeCol) return null;
 
   return [
-    {
-      inputName: 'x',
-      selectedSource: yCol.axesSpec[1],
-    },
-    {
-      inputName: 'y',
-      selectedSource: yCol,
-    },
-    {
-      inputName: 'grouping',
-      selectedSource: yCol.axesSpec[0],
-    },
-    {
-      inputName: 'shape',
-      selectedSource: shapeCol,
-    },
+    { inputName: 'x', selectedSource: yCol.axesSpec[1] },
+    { inputName: 'y', selectedSource: yCol },
+    { inputName: 'grouping', selectedSource: yCol.axesSpec[0] },
+    { inputName: 'shape', selectedSource: shapeCol },
   ];
 });
-
-const key = computed(() => defaultOptions.value ? JSON.stringify(defaultOptions.value) : '');
-
 </script>
 
 <template>
@@ -75,8 +74,7 @@ const key = computed(() => defaultOptions.value ? JSON.stringify(defaultOptions.
       No sequences found in the selected dataset. Please check your input data.
     </PlAlert>
     <GraphMaker
-      :key="key"
-      v-model="app.model.ui.graphState"
+      v-model="app.model.data.graphState"
       chart-type="scatterplot"
       :p-frame="app.model.outputs.graphPFrame"
       :default-options="defaultOptions"
@@ -92,19 +90,18 @@ const key = computed(() => defaultOptions.value ? JSON.stringify(defaultOptions.
       </template>
       <template #settingsSlot>
         <PlDropdownRef
-          v-model="app.model.args.datasetRef"
+          v-model="datasetRefModel"
           label="Select dataset"
           :options="app.model.outputs.datasetOptions"
           clearable
           :disabled="app.model.outputs.isRunning"
-          @update:model-value="setDatasetRef"
         >
           <template #tooltip>
             Select the dataset to be used for the rarefaction analysis.
           </template>
         </PlDropdownRef>
         <PlTextField
-          v-model="app.model.args.numPoints"
+          v-model="app.model.data.numPoints"
           label="Input points number"
           :disabled="app.model.outputs.isRunning"
         >
@@ -113,7 +110,7 @@ const key = computed(() => defaultOptions.value ? JSON.stringify(defaultOptions.
           </template>
         </PlTextField>
         <PlTextField
-          v-model="app.model.args.numIterations"
+          v-model="app.model.data.numIterations"
           label="Number of iterations per depth"
           :disabled="app.model.outputs.isRunning"
         >
@@ -122,7 +119,7 @@ const key = computed(() => defaultOptions.value ? JSON.stringify(defaultOptions.
           </template>
         </PlTextField>
         <PlCheckbox
-          v-model="app.model.args.extrapolation"
+          v-model="app.model.data.extrapolation"
           label="Extrapolation"
           :disabled="app.model.outputs.isRunning"
         >
@@ -133,7 +130,7 @@ const key = computed(() => defaultOptions.value ? JSON.stringify(defaultOptions.
         </PlCheckbox>
         <PlAccordionSection :label="strings.titles.advancedSettings">
           <PlNumberField
-            v-model="app.model.args.mem"
+            v-model="app.model.data.mem"
             label="Memory (GiB)"
             :disabled="app.model.outputs.isRunning"
             :min-value="1"
@@ -143,7 +140,7 @@ const key = computed(() => defaultOptions.value ? JSON.stringify(defaultOptions.
             </template>
           </PlNumberField>
           <PlNumberField
-            v-model="app.model.args.cpu"
+            v-model="app.model.data.cpu"
             label="CPU (cores)"
             :disabled="app.model.outputs.isRunning"
             :min-value="1"

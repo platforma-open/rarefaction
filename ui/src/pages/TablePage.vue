@@ -8,7 +8,6 @@ const app = useApp();
 const tableSettings = usePlDataTableSettingsV2({
   model: () => app.model.outputs.table,
 });
-
 </script>
 
 <template>
@@ -16,7 +15,7 @@ const tableSettings = usePlDataTableSettingsV2({
     title="Rarefaction"
   >
     <PlAgDataTableV2
-      v-model="app.model.ui.tableState"
+      v-model="app.model.data.tableState"
       :settings="tableSettings"
       :not-ready-text="strings.callToActions.configureSettingsAndRun"
       :no-rows-text="strings.states.noDataAvailable"
