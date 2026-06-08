@@ -2,7 +2,7 @@ wf := import("@platforma-sdk/workflow-tengo:workflow")
 assets := import("@platforma-sdk/workflow-tengo:assets")
 ll := import("@platforma-sdk/workflow-tengo:ll")
 pframes := import("@platforma-sdk/workflow-tengo:pframes")
-//pframesRs := import("@platforma-sdk/workflow-tengo:pframes-rs")
+bquery := import("@platforma-sdk/workflow-tengo:pframes.build-query-wasm")
 xsv := import("@platforma-sdk/workflow-tengo:pframes.xsv")
 pSpec := import("@platforma-sdk/workflow-tengo:pframes.spec")
 maps := import("@platforma-sdk/workflow-tengo:maps")
@@ -102,17 +102,14 @@ wf.body(func(args) {
 
 	datasetSpec := args.columns.getSpec(args.datasetRef)
 
-	// Ask the pframes-rs WASM component to build a v1 query for the
-	// `abundance` column. Returns an error today because the wasm-call
-	// runtime is still on plan/tengo-wasm-call; once that lands, only
-	// the SDK wrapper changes and the call below starts returning a real
-	// SpecQueryJoinEntry. The block tolerates the runtime-gap error so
-	// rendering proceeds in the meantime.
-	// wasmQueryRequest := { version: "v1", column: "abundance" }
-	// wasmBuiltQuery := pframesRs.frame.buildQuery(wasmQueryRequest)
-	// if is_error(wasmBuiltQuery) {
-	// 	ll.print("pframes-rs.frame.buildQuery unavailable, continuing without wasm-built query: " + string(wasmBuiltQuery))
-	// }
+	// Sanity-check the wasm-backed buildQuery wrapper end-to-end inside
+	// a real block render. The returned SpecQueryJoinEntry is logged for
+	// inspection; rarefaction itself doesn't consume it yet.
+	abundanceQuery := bquery.buildQuery({
+		version: "v1",
+		column: "abundance"
+	})
+	ll.print("rarefaction: wasm buildQuery(abundance) =", abundanceQuery)
 
 	convMem := string(args.mem) + "GiB"
 
