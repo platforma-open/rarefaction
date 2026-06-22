@@ -16,17 +16,17 @@ export function getDefaultBlockLabel(data: {
     secondaryParts.push(`${data.numPoints} points`);
   }
   if (data.extrapolation) {
-    secondaryParts.push('extrapolated');
+    secondaryParts.push("extrapolated");
   }
 
   // Combine: "Dataset - 10 points, extrapolated"
   if (parts.length > 0 && secondaryParts.length > 0) {
-    return `${parts[0]} - ${secondaryParts.join(', ')}`;
+    return `${parts[0]} - ${secondaryParts.join(", ")}`;
   } else if (secondaryParts.length > 0) {
-    return secondaryParts.join(', ');
+    return secondaryParts.join(", ");
   } else if (parts.length > 0) {
     return parts[0];
   }
 
-  return 'Select dataset';
+  return "Select dataset";
 }

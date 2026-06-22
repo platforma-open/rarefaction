@@ -14,3 +14,4 @@ software/*.tgz
 .vscode/sftp.json
 test-dry-run.json
 .idea/
+software/**/*.tgz

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { PlAgDataTableV2, PlBlockPage, usePlDataTableSettingsV2 } from '@platforma-sdk/ui-vue';
-import strings from '@milaboratories/strings';
-import { useApp } from '../app';
+import { PlAgDataTableV2, PlBlockPage, usePlDataTableSettingsV2 } from "@platforma-sdk/ui-vue";
+import strings from "@milaboratories/strings";
+import { useApp } from "../app";
 
 const app = useApp();
 
@@ -11,9 +11,7 @@ const tableSettings = usePlDataTableSettingsV2({
 </script>
 
 <template>
-  <PlBlockPage
-    title="Rarefaction"
-  >
+  <PlBlockPage title="Rarefaction">
     <PlAgDataTableV2
       v-model="app.model.data.tableState"
       :settings="tableSettings"
