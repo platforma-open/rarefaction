@@ -1,6 +1,7 @@
 {
   "name": "@platforma-open/milaboratories.rarefaction.model",
   "version": "2.1.0",
+  "private": true,
   "description": "Block model",
   "type": "module",
   "main": "dist/index.cjs",
