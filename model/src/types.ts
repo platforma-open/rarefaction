@@ -1,5 +1,5 @@
-import type { GraphMakerState } from '@milaboratories/graph-maker';
-import type { PlDataTableStateV2, PlRef } from '@platforma-sdk/model';
+import type { GraphMakerState } from "@milaboratories/graph-maker";
+import type { PlDataTableStateV2, PlRef } from "@platforma-sdk/model";
 
 /** Unified V3 data: persisted state shaped on the UI's terms. */
 export type BlockData = {

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { PredefinedGraphOption } from '@milaboratories/graph-maker';
-import { GraphMaker } from '@milaboratories/graph-maker';
-import strings from '@milaboratories/strings';
-import type { PColumnSpec, PlRef } from '@platforma-sdk/model';
-import { plRefsEqual } from '@platforma-sdk/model';
+import type { PredefinedGraphOption } from "@milaboratories/graph-maker";
+import { GraphMaker } from "@milaboratories/graph-maker";
+import strings from "@milaboratories/strings";
+import type { PColumnSpec, PlRef } from "@platforma-sdk/model";
+import { plRefsEqual } from "@platforma-sdk/model";
 import {
   PlAccordionSection,
   PlAlert,
@@ -15,9 +15,9 @@ import {
   PlMaskIcon24,
   PlNumberField,
   PlSlideModal,
-} from '@platforma-sdk/ui-vue';
-import { computed, ref, watch } from 'vue';
-import { useApp } from '../app';
+} from "@platforma-sdk/ui-vue";
+import { computed, ref, watch } from "vue";
+import { useApp } from "../app";
 
 const app = useApp();
 
@@ -53,7 +53,9 @@ const numPointsModel = computed({
     const n = Number(app.model.data.numPoints);
     return Number.isFinite(n) ? n : undefined;
   },
-  set: (v) => { app.model.data.numPoints = v === undefined ? '' : String(v); },
+  set: (v) => {
+    app.model.data.numPoints = v === undefined ? "" : String(v);
+  },
 });
 
 const numIterationsModel = computed({
@@ -61,18 +63,20 @@ const numIterationsModel = computed({
     const n = Number(app.model.data.numIterations);
     return Number.isFinite(n) ? n : undefined;
   },
-  set: (v) => { app.model.data.numIterations = v === undefined ? '' : String(v); },
+  set: (v) => {
+    app.model.data.numIterations = v === undefined ? "" : String(v);
+  },
 });
 
 function validateIntCount(value: number | undefined): string | undefined {
-  if (value === undefined) return 'Required';
-  if (!Number.isInteger(value)) return 'Must be an integer';
-  if (value < 1) return 'Must be at least 1';
-  if (value >= 10000) return 'Must be less than 10000';
+  if (value === undefined) return "Required";
+  if (!Number.isInteger(value)) return "Must be an integer";
+  if (value < 1) return "Must be at least 1";
+  if (value >= 10000) return "Must be less than 10000";
   return undefined;
 }
 
-const defaultOptions = computed((): PredefinedGraphOption<'scatterplot'>[] | null => {
+const defaultOptions = computed((): PredefinedGraphOption<"scatterplot">[] | null => {
   const pCols = app.model.outputs.rarefactionPFrameCols;
   if (!pCols) return null;
 
@@ -80,16 +84,16 @@ const defaultOptions = computed((): PredefinedGraphOption<'scatterplot'>[] | nul
     return cols.find((p) => p.name === name);
   }
 
-  const yCol = getColumnSpec('pl7.app/rarefaction/meanUniqueSequences', pCols);
-  const shapeCol = getColumnSpec('pl7.app/rarefaction/type', pCols);
+  const yCol = getColumnSpec("pl7.app/rarefaction/meanUniqueSequences", pCols);
+  const shapeCol = getColumnSpec("pl7.app/rarefaction/type", pCols);
 
   if (!yCol || !shapeCol) return null;
 
   return [
-    { inputName: 'x', selectedSource: yCol.axesSpec[1] },
-    { inputName: 'y', selectedSource: yCol },
-    { inputName: 'grouping', selectedSource: yCol.axesSpec[0] },
-    { inputName: 'shape', selectedSource: shapeCol },
+    { inputName: "x", selectedSource: yCol.axesSpec[1] },
+    { inputName: "y", selectedSource: yCol },
+    { inputName: "grouping", selectedSource: yCol.axesSpec[0] },
+    { inputName: "shape", selectedSource: shapeCol },
   ];
 });
 </script>
@@ -161,7 +165,8 @@ const defaultOptions = computed((): PredefinedGraphOption<'scatterplot'>[] | nul
         >
           Extrapolate to largest sample
           <template #tooltip>
-            Extrapolate the number of unique sequences for depths greater than the total number of sequences.
+            Extrapolate the number of unique sequences for depths greater than the total number of
+            sequences.
           </template>
         </PlCheckbox>
         <PlAccordionSection :label="strings.titles.advancedSettings">
@@ -171,9 +176,7 @@ const defaultOptions = computed((): PredefinedGraphOption<'scatterplot'>[] | nul
             :disabled="app.model.outputs.isRunning"
             :min-value="1"
           >
-            <template #tooltip>
-              The amount of memory to allocate to the job.
-            </template>
+            <template #tooltip> The amount of memory to allocate to the job. </template>
           </PlNumberField>
           <PlNumberField
             v-model="app.model.data.cpu"
@@ -181,16 +184,14 @@ const defaultOptions = computed((): PredefinedGraphOption<'scatterplot'>[] | nul
             :disabled="app.model.outputs.isRunning"
             :min-value="1"
           >
-            <template #tooltip>
-              The number of CPU cores to allocate to the job.
-            </template>
+            <template #tooltip> The number of CPU cores to allocate to the job. </template>
           </PlNumberField>
         </PlAccordionSection>
       </template>
     </GraphMaker>
     <PlSlideModal v-model="logOpen" width="80%">
       <template #title>Rarefaction Log</template>
-      <PlLogView :log-handle="app.model.outputs.rarefactionLogs"/>
+      <PlLogView :log-handle="app.model.outputs.rarefactionLogs" />
     </PlSlideModal>
   </PlBlockPage>
 </template>
