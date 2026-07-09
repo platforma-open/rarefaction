@@ -25,7 +25,8 @@ jobs:
       app-name: 'Block: Rarefaction'
       app-name-slug: 'block-rarefaction'
       node-version: '20.x'
-      build-script-name: 'build:release'
+      build-script-name: 'build:dev-local'
+      build-before-publish-script-name: 'build:release'
       pnpm-recursive-build: false
 
       test: true
