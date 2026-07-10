@@ -1,5 +1,11 @@
 # @platforma-open/milaboratories.rarefaction.ui
 
+## 2.1.2
+
+### Patch Changes
+
+- 074f69d: update graph-maker and deps
+
 ## 2.1.1
 
 ### Patch Changes
