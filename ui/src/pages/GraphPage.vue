@@ -108,6 +108,7 @@ const defaultOptions = computed((): PredefinedGraphOption<"scatterplot">[] | nul
       chart-type="scatterplot"
       :p-frame="app.model.outputs.graphPFrame"
       :default-options="defaultOptions"
+      default-palette="bright"
       :status-text="{ noPframe: { title: strings.callToActions.configureSettingsAndRun } }"
     >
       <template #titleLineSlot>
