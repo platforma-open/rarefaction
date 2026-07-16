@@ -1,5 +1,11 @@
 # @platforma-open/milaboratories.rarefaction.workflow
 
+## 2.0.3
+
+### Patch Changes
+
+- 19a3a74: SDK Update
+
 ## 2.0.2
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @platforma-open/milaboratories.rarefaction.ui
 
+## 2.1.3
+
+### Patch Changes
+
+- 19a3a74: SDK Update
+- Updated dependencies [19a3a74]
+  - @platforma-open/milaboratories.rarefaction.model@2.1.2
+
 ## 2.1.2
 
 ### Patch Changes
