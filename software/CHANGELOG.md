@@ -1,5 +1,11 @@
 # @platforma-open/milaboratories.rarefaction.software
 
+## 2.0.3
+
+### Patch Changes
+
+- c5e69ac: Release software
+
 ## 2.0.2
 
 ### Patch Changes

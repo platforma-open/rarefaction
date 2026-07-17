@@ -1,5 +1,13 @@
 # @platforma-open/milaboratories.rarefaction.workflow
 
+## 2.0.4
+
+### Patch Changes
+
+- c5e69ac: Release software
+- Updated dependencies [c5e69ac]
+  - @platforma-open/milaboratories.rarefaction.software@2.0.3
+
 ## 2.0.3
 
 ### Patch Changes
