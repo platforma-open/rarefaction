@@ -6,6 +6,7 @@ import {
   createPlDataTableV2,
   DataModelBuilder,
 } from "@platforma-sdk/model";
+import { kind } from "@platforma-open/milaboratories.rarefaction.kind";
 import { getDefaultBlockLabel } from "./label";
 import type { BlockArgs, BlockData, LegacyBlockArgs, LegacyBlockUiState } from "./types";
 
@@ -17,7 +18,7 @@ const defaultGraphState = (): BlockData["graphState"] => ({
   currentTab: "settings",
 });
 
-const blockDataModel = new DataModelBuilder()
+const blockDataModel = new DataModelBuilder({ kind })
   .from<BlockData>("V20260518")
   .upgradeLegacy<LegacyBlockArgs, LegacyBlockUiState>(({ args, uiState }) => ({
     customBlockLabel: args?.customBlockLabel ?? "",
@@ -33,15 +34,17 @@ const blockDataModel = new DataModelBuilder()
     tableState: uiState?.tableState ?? createPlDataTableStateV2(),
     graphState: uiState?.graphState ?? defaultGraphState(),
   }))
-  .init(() => ({
-    customBlockLabel: "",
-    datasetRef: undefined,
-    datasetLabel: undefined,
-    numPoints: "20",
-    numIterations: "100",
-    extrapolation: true,
-    mem: 8,
-    cpu: 4,
+  // `params` is absent when a block is created by hand rather than from a
+  // template, so every field the contract carries keeps its own default.
+  .init(({ params }) => ({
+    customBlockLabel: params?.customBlockLabel ?? "",
+    datasetRef: params?.datasetRef,
+    datasetLabel: params?.datasetLabel,
+    numPoints: params?.numPoints ?? "20",
+    numIterations: params?.numIterations ?? "100",
+    extrapolation: params?.extrapolation ?? true,
+    mem: params?.mem ?? 8,
+    cpu: params?.cpu ?? 4,
     tableState: createPlDataTableStateV2(),
     graphState: defaultGraphState(),
   }));
@@ -63,7 +66,25 @@ function deriveSubtitle(data: BlockData): string {
   );
 }
 
-export const platforma = BlockModelV3.create(blockDataModel)
+export const platforma = BlockModelV3.create({ dataModel: blockDataModel, kind })
+
+  // Inverse of `init` — the same fields, projected back out for template export,
+  // handed back exactly as they sit in live state. `tableState` and `graphState`
+  // are view state and never cross the boundary. `datasetRef` carries a block id,
+  // which the SDK rewrites on the way out and resolves again on the way in.
+  .templateParams((data) => ({
+    datasetRef: data.datasetRef,
+
+    numPoints: data.numPoints,
+    numIterations: data.numIterations,
+    extrapolation: data.extrapolation,
+
+    mem: data.mem,
+    cpu: data.cpu,
+
+    datasetLabel: data.datasetLabel,
+    customBlockLabel: data.customBlockLabel,
+  }))
 
   .args<BlockArgs>((data) => {
     if (data.datasetRef === undefined) throw new Error("Dataset is required");

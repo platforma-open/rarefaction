@@ -26,6 +26,7 @@
   "devDependencies": {
     "@milaboratories/ts-builder": "catalog:",
     "@milaboratories/ts-configs": "catalog:",
+    "@platforma-open/milaboratories.rarefaction.kind": "workspace:*",
     "@platforma-open/milaboratories.rarefaction.model": "workspace:*",
     "@platforma-open/milaboratories.rarefaction.ui": "workspace:*",
     "@platforma-open/milaboratories.rarefaction.workflow": "workspace:*",
