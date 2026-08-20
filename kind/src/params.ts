@@ -1,6 +1,7 @@
 import { assertParamsObject } from "@platforma-sdk/block-kind";
 import { isPlRef } from "@platforma-sdk/model";
 import { isBoolean, isString } from "es-toolkit";
+import { isNumber } from "es-toolkit/compat";
 import type { BlockParams } from "./types";
 
 /**
@@ -40,9 +41,6 @@ function check<T>(is: Guard<T>, must: string): Check<T> {
   return { is, must };
 }
 
-/** `Number.isInteger` already rejects non-numbers; this only adds the narrowing. */
-const isInteger: Guard<number> = (v): v is number => Number.isInteger(v);
-
 const REF = "a reference to another block's output";
 
 /**
@@ -72,8 +70,8 @@ const CONTRACT = {
   numIterations: check(isString, "a string"),
   extrapolation: check(isBoolean, "a boolean"),
 
-  mem: check(isInteger, "an integer"),
-  cpu: check(isInteger, "an integer"),
+  mem: check(isNumber, "a number"),
+  cpu: check(isNumber, "a number"),
 
   datasetLabel: check(isString, "a string"),
   customBlockLabel: check(isString, "a string"),
