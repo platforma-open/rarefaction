@@ -1,5 +1,11 @@
 # @platforma-open/milaboratories.rarefaction
 
+## 2.2.1
+
+### Patch Changes
+
+- 8eb9956: Update SDK: PlAgDataTable no longer recreates its grid in an endless loop
+
 ## 2.2.0
 
 ### Minor Changes
