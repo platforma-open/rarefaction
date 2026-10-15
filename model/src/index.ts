@@ -1,10 +1,13 @@
-import type { InferOutputsType } from "@platforma-sdk/model";
+import type { DatasetOption, InferOutputsType } from "@platforma-sdk/model";
 import {
   BlockModelV3,
+  buildDatasetOptions,
+  createGlobalPObjectId,
   createPFrameForGraphs,
   createPlDataTableStateV2,
   createPlDataTableV2,
   DataModelBuilder,
+  isPColumnSpec,
 } from "@platforma-sdk/model";
 import { kind } from "@platforma-open/milaboratories.rarefaction.kind";
 import { getDefaultBlockLabel } from "./label";
@@ -39,6 +42,7 @@ const blockDataModel = new DataModelBuilder({ kind })
   .init(({ params }) => ({
     customBlockLabel: params?.customBlockLabel ?? "",
     datasetRef: params?.datasetRef,
+    filterRef: params?.filterRef,
     datasetLabel: params?.datasetLabel,
     numPoints: params?.numPoints ?? "20",
     numIterations: params?.numIterations ?? "100",
@@ -66,6 +70,13 @@ function deriveSubtitle(data: BlockData): string {
   );
 }
 
+// Key axes of the datasets this block accepts: bulk and single-cell clonotypes, and variants.
+const DATASET_KEY_AXES: ReadonlySet<string> = new Set([
+  "pl7.app/vdj/clonotypeKey",
+  "pl7.app/vdj/scClonotypeKey",
+  "pl7.app/variantKey",
+]);
+
 export const platforma = BlockModelV3.create({ dataModel: blockDataModel, kind })
 
   // Inverse of `init` — the same fields, projected back out for template export,
@@ -74,6 +85,7 @@ export const platforma = BlockModelV3.create({ dataModel: blockDataModel, kind }
   // which the SDK rewrites on the way out and resolves again on the way in.
   .templateParams((data) => ({
     datasetRef: data.datasetRef,
+    filterRef: data.filterRef,
 
     numPoints: data.numPoints,
     numIterations: data.numIterations,
@@ -96,6 +108,9 @@ export const platforma = BlockModelV3.create({ dataModel: blockDataModel, kind }
 
     return {
       datasetRef: data.datasetRef,
+      ...(data.filterRef !== undefined && {
+        inputFilter: createGlobalPObjectId(data.filterRef.blockId, data.filterRef.name),
+      }),
       numPoints: data.numPoints.trim(),
       numIterations: data.numIterations.trim(),
       extrapolation: data.extrapolation,
@@ -123,21 +138,24 @@ export const platforma = BlockModelV3.create({ dataModel: blockDataModel, kind }
     return createPlDataTableV2(ctx, cols, ctx.data.tableState);
   })
 
-  .output("datasetOptions", (ctx) =>
-    ctx.resultPool.getOptions([
-      {
-        axes: [{ name: "pl7.app/sampleId" }, { name: "pl7.app/vdj/clonotypeKey" }],
-        annotations: { "pl7.app/isAnchor": "true" },
-      },
-      {
-        axes: [{ name: "pl7.app/sampleId" }, { name: "pl7.app/vdj/scClonotypeKey" }],
-        annotations: { "pl7.app/isAnchor": "true" },
-      },
-      {
-        axes: [{ name: "pl7.app/sampleId" }, { name: "pl7.app/variantKey" }],
-        annotations: { "pl7.app/isAnchor": "true" },
-      },
-    ]),
+  // Datasets, each with its subset columns (e.g. Repertoire Labeling labels) as filters.
+  .output(
+    "datasetOptions",
+    (ctx): DatasetOption[] =>
+      buildDatasetOptions(ctx, {
+        primary: (spec) =>
+          isPColumnSpec(spec) &&
+          spec.annotations?.["pl7.app/isAnchor"] === "true" &&
+          spec.axesSpec.length === 2 &&
+          spec.axesSpec[0].name === "pl7.app/sampleId" &&
+          DATASET_KEY_AXES.has(spec.axesSpec[1].name),
+        // Only subsets keyed by the clonotype axis alone: curves count clonotypes.
+        filter: (spec) =>
+          isPColumnSpec(spec) &&
+          spec.axesSpec.length === 1 &&
+          DATASET_KEY_AXES.has(spec.axesSpec[0].name),
+        requireEnrichments: false,
+      }) ?? [],
   )
 
   .output("isRunning", (ctx) => ctx.outputs?.getIsReadyOrError() === false)

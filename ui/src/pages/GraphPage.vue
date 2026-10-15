@@ -2,15 +2,15 @@
 import type { PredefinedGraphOption } from "@milaboratories/graph-maker";
 import { GraphMaker } from "@milaboratories/graph-maker";
 import strings from "@milaboratories/strings";
-import type { PColumnSpec, PlRef } from "@platforma-sdk/model";
-import { plRefsEqual } from "@platforma-sdk/model";
+import type { DatasetSelection, PColumnSpec } from "@platforma-sdk/model";
+import { createDatasetSelection, createPrimaryRef, plRefsEqual } from "@platforma-sdk/model";
 import {
   PlAccordionSection,
   PlAlert,
   PlBlockPage,
   PlBtnGhost,
   PlCheckbox,
-  PlDropdownRef,
+  PlDatasetSelector,
   PlLogView,
   PlMaskIcon24,
   PlNumberField,
@@ -33,15 +33,26 @@ watch(
   },
 );
 
-const datasetRefModel = computed({
-  get: () => app.model.data.datasetRef,
-  set: (selectedRef: PlRef | undefined) => {
-    app.model.data.datasetRef = selectedRef;
-    // Snapshot the chosen dataset's human label into `data` so `.subtitle`
+const datasetSelection = computed<DatasetSelection | undefined>({
+  get: () => {
+    const { datasetRef, filterRef } = app.model.data;
+    if (datasetRef === undefined) return undefined;
+    return createDatasetSelection(createPrimaryRef(datasetRef, filterRef));
+  },
+  set: (selection) => {
+    const datasetRef = selection?.primary.column;
+    const filterRef = selection?.primary.filter;
+    app.model.data.datasetRef = datasetRef;
+    app.model.data.filterRef = filterRef;
+    // Snapshot the chosen dataset's (or subset's) human label into `data` so `.subtitle`
     // can derive the default block label without re-querying the result pool.
-    app.model.data.datasetLabel = selectedRef
-      ? app.model.outputs.datasetOptions?.find((o) => plRefsEqual(o.ref, selectedRef))?.label
+    const option = datasetRef
+      ? app.model.outputs.datasetOptions?.find((o) => plRefsEqual(o.primary.ref, datasetRef, true))
       : undefined;
+    const filter = filterRef
+      ? option?.filters?.find((f) => plRefsEqual(f.ref, filterRef, true))
+      : undefined;
+    app.model.data.datasetLabel = (filter ?? option?.primary)?.label;
   },
 });
 
@@ -120,8 +131,8 @@ const defaultOptions = computed((): PredefinedGraphOption<"scatterplot">[] | nul
         </PlBtnGhost>
       </template>
       <template #settingsSlot>
-        <PlDropdownRef
-          v-model="datasetRefModel"
+        <PlDatasetSelector
+          v-model="datasetSelection"
           label="Select dataset"
           :options="app.model.outputs.datasetOptions"
           clearable
@@ -130,7 +141,7 @@ const defaultOptions = computed((): PredefinedGraphOption<"scatterplot">[] | nul
           <template #tooltip>
             Select the dataset to be used for the rarefaction analysis.
           </template>
-        </PlDropdownRef>
+        </PlDatasetSelector>
         <PlNumberField
           v-model="numPointsModel"
           label="Input points number"
