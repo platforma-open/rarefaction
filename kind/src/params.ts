@@ -65,6 +65,7 @@ const REF = "a reference to another block's output";
  */
 const CONTRACT = {
   datasetRef: check(isPlRef, REF),
+  filterRef: check(isPlRef, REF),
 
   numPoints: check(isString, "a string"),
   numIterations: check(isString, "a string"),

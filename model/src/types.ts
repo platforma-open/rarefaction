@@ -5,8 +5,10 @@ import type { PlDataTableStateV2, PlRef } from "@platforma-sdk/model";
 export type BlockData = {
   customBlockLabel: string;
   datasetRef?: PlRef;
+  /** Subset column picked with the dataset in PlDatasetSelector (e.g. a Repertoire Labeling label). */
+  filterRef?: PlRef;
   /**
-   * Human-readable label of the chosen dataset, snapshotted by the UI in the
+   * Human-readable label of the chosen dataset (or subset), snapshotted by the UI in the
    * same gesture that picks `datasetRef`. Consumed by `.subtitle` so the
    * default label can be derived without re-querying the result pool there.
    */
@@ -23,6 +25,7 @@ export type BlockData = {
 /** Projected args consumed by the workflow. */
 export type BlockArgs = {
   datasetRef: PlRef;
+  inputFilter?: string;
   numPoints: string;
   numIterations: string;
   extrapolation: boolean;

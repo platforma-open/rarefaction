@@ -3,7 +3,7 @@ import type { PlRef } from "@platforma-sdk/model";
 /**
  * This block's init-params contract — the shape a block of this kind receives
  * at creation, and exactly what a project template serializes for it: which
- * dataset the curves are drawn from, the knobs that decide what gets computed,
+ * dataset the curves are drawn from (and an optional subset of it), the knobs that decide what gets computed,
  * and the naming shown on the block.
  *
  * Every field is optional. A block with no dataset picked is an ordinary state
@@ -18,6 +18,8 @@ import type { PlRef } from "@platforma-sdk/model";
 export type BlockParams = {
   // Input wiring — a PlRef a template engine fills from an earlier entry's output.
   datasetRef?: PlRef;
+  /** A subset column (`pl7.app/isSubset`) the dataset is restricted to before the analysis. */
+  filterRef?: PlRef;
 
   // Analysis configuration — the recipe a template exists to reproduce.
   numPoints?: string;
